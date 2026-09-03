@@ -88,6 +88,16 @@ Create a simple placeholder for:
 
 - Module 02 - Operations Core
 - Module 03 - Scheduling and Dispatch
+- Module 05 - Technician Web Support
+- Module 12 - Shared Operational Workflows
+
+## Your Full Module Files
+
+- `SWETHA_MODULE_01_FOUNDATION_OPERATIONS.md`
+- `SWETHA_MODULE_02_OPERATIONS_CORE.md`
+- `SWETHA_MODULE_03_SCHEDULING_DISPATCH.md`
+- `SWETHA_MODULE_05_TECHNICIAN_WEB_SUPPORT.md`
+- `SWETHA_MODULE_12_SHARED_WORKFLOWS.md`
 
 ## Coordination With Arshidha
 

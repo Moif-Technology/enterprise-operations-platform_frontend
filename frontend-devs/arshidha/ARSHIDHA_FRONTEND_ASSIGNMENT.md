@@ -101,6 +101,18 @@ Do not build full screens yet. Just create reusable patterns that later modules 
 - Module 08 - Procurement
 - Module 09 - Finance
 - Module 10 - Reports and AI
+- Module 11 - Settings and Platform Admin
+
+## Your Full Module Files
+
+- `ARSHIDHA_MODULE_01_DESIGN_SYSTEM.md`
+- `ARSHIDHA_MODULE_04_ASSETS_MAINTENANCE.md`
+- `ARSHIDHA_MODULE_06_CUSTOMERS_CONTRACTS.md`
+- `ARSHIDHA_MODULE_07_INVENTORY.md`
+- `ARSHIDHA_MODULE_08_PROCUREMENT.md`
+- `ARSHIDHA_MODULE_09_FINANCE.md`
+- `ARSHIDHA_MODULE_10_REPORTS_AI.md`
+- `ARSHIDHA_MODULE_11_SETTINGS_PLATFORM_ADMIN.md`
 
 ## Coordination With Swetha
 
