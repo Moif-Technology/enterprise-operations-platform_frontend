@@ -10,7 +10,7 @@ Both developers should start with Module 01 alignment:
 - Run the frontend locally.
 - Review the current design-system preview.
 
-## Developer 1 - Operations Flow Owner
+## Swetha - Operations Flow Owner
 
 ### Main Ownership
 
@@ -41,9 +41,9 @@ Build the operational foundation components:
 
 ### Important Rule
 
-Developer 1 should make the request-to-work-order journey feel connected. Do not design Service Requests and Work Orders like separate products.
+Swetha should make the request-to-work-order journey feel connected. Do not design Service Requests and Work Orders like separate products.
 
-## Developer 2 - Assets And Business Support Owner
+## Arshidha - Design System And Business Support Owner
 
 ### Main Ownership
 
@@ -85,7 +85,7 @@ Build the shared foundation components:
 
 ### Important Rule
 
-Developer 2 should make all support modules use the same list/detail/form patterns. Avoid each module becoming visually different.
+Arshidha should make all support modules use the same list/detail/form patterns. Avoid each module becoming visually different.
 
 ## Shared Coordination
 
@@ -103,10 +103,10 @@ Both developers must coordinate on:
 
 ## Suggested Work Order
 
-1. Developer 1 builds app shell and navigation.
-2. Developer 2 builds shared design system components.
-3. Developer 1 creates Operations placeholders.
-4. Developer 2 creates Assets and shared state placeholders.
+1. Swetha builds app shell and navigation.
+2. Arshidha builds shared design system components.
+3. Swetha creates Operations placeholders.
+4. Arshidha creates Assets and shared state placeholders.
 5. Both review the UI together before starting Module 02.
 
 ## What To Avoid

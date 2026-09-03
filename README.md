@@ -23,9 +23,10 @@ http://localhost:3000
 
 Read in this order:
 
-1. `docs/FRONTEND_DEVELOPER_SPLIT.md`
+1. `frontend-devs/swetha/SWETHA_FRONTEND_ASSIGNMENT.md` or `frontend-devs/arshidha/ARSHIDHA_FRONTEND_ASSIGNMENT.md`
 2. `docs/DESIGN_SYSTEM.md`
 3. `docs/MODULE_01_FOUNDATION.md`
+4. `docs/FRONTEND_DEVELOPER_SPLIT.md`
 
 ## Current Scope
 
