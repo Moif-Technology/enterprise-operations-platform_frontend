@@ -34,11 +34,6 @@ Build the operational foundation components:
 - Service request placeholder page
 - Work order placeholder page
 
-### Later Modules
-
-- Module 02 - Operations Core
-- Module 03 - Scheduling and Dispatch
-
 ### Important Rule
 
 Swetha should make the request-to-work-order journey feel connected. Do not design Service Requests and Work Orders like separate products.
@@ -74,15 +69,6 @@ Build the shared foundation components:
 - AI suggestion panel
 - Asset placeholder page
 
-### Later Modules
-
-- Module 04 - Assets and Preventive Maintenance
-- Module 06 - Customers, Sites, Contracts, AMC
-- Module 07 - Inventory
-- Module 08 - Procurement
-- Module 09 - Finance
-- Module 10 - Reports and AI
-
 ### Important Rule
 
 Arshidha should make all support modules use the same list/detail/form patterns. Avoid each module becoming visually different.
@@ -112,6 +98,7 @@ Both developers must coordinate on:
 ## What To Avoid
 
 - Do not start all modules at once.
+- Do not start later modules until Module 01 is reviewed.
 - Do not create separate styles per developer.
 - Do not make large dashboards with many charts.
 - Do not build backend integration in Module 01.

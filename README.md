@@ -23,14 +23,13 @@ http://localhost:3000
 
 Read in this order:
 
-1. `frontend-devs/FRONTEND_MODULE_INDEX.md`
-2. `frontend-devs/swetha/SWETHA_FRONTEND_ASSIGNMENT.md` or `frontend-devs/arshidha/ARSHIDHA_FRONTEND_ASSIGNMENT.md`
-3. `docs/DESIGN_SYSTEM.md`
-4. `docs/MODULE_01_FOUNDATION.md`
-5. `docs/FRONTEND_DEVELOPER_SPLIT.md`
+1. `docs/DESIGN_SYSTEM.md`
+2. `docs/MODULE_01_FOUNDATION.md`
+3. `docs/FRONTEND_DEVELOPER_SPLIT.md`
 
 ## Current Scope
 
 - Frontend only.
 - Backend APIs are not required for Module 01.
 - Use placeholder/sample data until backend modules are ready.
+- Do not start later business modules until Module 01 is reviewed.
