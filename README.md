@@ -26,6 +26,9 @@ Read in this order:
 1. `docs/DESIGN_SYSTEM.md`
 2. `docs/MODULE_01_FOUNDATION.md`
 3. `docs/FRONTEND_DEVELOPER_SPLIT.md`
+4. Your personal assignment file:
+   - Swetha: `docs/assignments/SWETHA_MODULE_01.md`
+   - Arshidha: `docs/assignments/ARSHIDHA_MODULE_01.md`
 
 ## Current Scope
 
