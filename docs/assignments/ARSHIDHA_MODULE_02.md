@@ -1,4 +1,4 @@
-﻿# Arshidha - Module 02 Assignment: Assets and Basic Preventive Maintenance
+# Arshidha - Module 02 Assignment: Assets and Basic Preventive Maintenance
 
 ## Goal and scope
 
@@ -75,4 +75,3 @@ Do not implement backend/database integration, real authentication, production u
 Open a PR with the screens implemented, screenshots or a short walkthrough, verification results, sample-data/reset instructions, reusable component changes and remaining API dependencies. Request review before marking the task complete. Deliver the asset list/form/detail first, then the maintenance screens and mock handoff.
 
 This assignment is self-contained; the parent project roadmap is not required to implement it.
-
