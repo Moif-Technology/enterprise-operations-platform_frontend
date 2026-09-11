@@ -1,5 +1,9 @@
 # Frontend Developer Split
 
+## Current assignment update
+
+Arshidha's Module 01 is complete per the project owner. Her active second assignment is [ARSHIDHA_MODULE_02.md](assignments/ARSHIDHA_MODULE_02.md) on branch `sabeeh`: Assets and Basic Preventive Maintenance. Follow that file for her current scope; the Module-01-only directions below describe the earlier foundation stage. Operations Core ownership remains with Swetha.
+
 ## First Task For Both Developers
 
 Both developers should start with Module 01 alignment:
