@@ -23,7 +23,12 @@ let plansStore: MaintenancePlan[] = seedPlans.map((plan) => ({
   ...plan,
   checklist: [...plan.checklist],
 }));
-
+let serviceHistoryStore: ServiceHistoryEntry[] = serviceHistory.map(
+  (entry) => ({ ...entry }),
+);
+let mockWorkOrdersStore: MockWorkOrder[] = mockWorkOrders.map(
+  (workOrder) => ({ ...workOrder }),
+);
 function cloneAsset(asset: Asset): Asset {
   return { ...asset };
 }
@@ -73,6 +78,11 @@ export function saveAsset(asset: Asset): Asset {
 export function getMaintenancePlans(): MaintenancePlan[] {
   return plansStore.map(clonePlan);
 }
+export function getMaintenancePlan(
+  planId: string
+): MaintenancePlan | undefined {
+  return getMaintenancePlans().find((plan) => plan.id === planId);
+}
 
 export function getMaintenancePlanById(id: string): MaintenancePlan | undefined {
   const plan = plansStore.find((item) => item.id === id);
@@ -100,7 +110,7 @@ export function saveMaintenancePlan(plan: MaintenancePlan): MaintenancePlan {
 export function getServiceHistoryByAssetId(
   assetId: string,
 ): ServiceHistoryEntry[] {
-  return serviceHistory
+  return serviceHistoryStore
     .filter((entry) => entry.assetId === assetId)
     .map((entry) => ({ ...entry }));
 }
@@ -112,17 +122,75 @@ export function getDocumentsByAssetId(assetId: string): AssetDocument[] {
 }
 
 export function getMockWorkOrders(): MockWorkOrder[] {
-  return mockWorkOrders.map((workOrder) => ({ ...workOrder }));
+  return mockWorkOrdersStore.map((workOrder) => ({ ...workOrder }));
 }
 
 export function getMockWorkOrdersByAssetId(assetId: string): MockWorkOrder[] {
-  return mockWorkOrders
+  return mockWorkOrdersStore
     .filter((workOrder) => workOrder.assetId === assetId)
     .map((workOrder) => ({ ...workOrder }));
 }
+export function getMockWorkOrdersByPlanId(
+  planId: string,
+): MockWorkOrder[] {
+  return mockWorkOrdersStore
+    .filter((workOrder) => workOrder.planId === planId)
+    .map((workOrder) => ({ ...workOrder }));
+}
+export function completeMockWorkOrder(
+  workOrderId: string,
+  completedOn: string,
+  notes?: string,
+): MockWorkOrder | undefined {
+  const workOrder = mockWorkOrdersStore.find(
+    (item) => item.id === workOrderId,
+  );
 
+  if (!workOrder || workOrder.status === "completed") {
+    return undefined;
+  }
+
+  workOrder.status = "completed";
+  workOrder.completedOn = completedOn;
+  workOrder.notes = notes ?? workOrder.notes;
+  const historyAlreadyExists = serviceHistoryStore.some(
+    (entry) => entry.workOrderId === workOrder.id,
+  );
+  
+  if (!historyAlreadyExists) {
+    serviceHistoryStore.push({
+      id: `history-${workOrder.id}`,
+      assetId: workOrder.assetId,
+      planId: workOrder.planId,
+      workOrderId: workOrder.id,
+      performedOn: completedOn,
+      summary: workOrder.title,
+      performedBy: "PM Service Team",
+      outcome: "completed",
+    });
+  }
+  const plan = plansStore.find((item) => item.id === workOrder.planId);
+
+  if (plan) {
+    const nextDueDate = new Date(plan.nextDueDate);
+    const days =
+      plan.frequency === "weekly" ? 7 : 30;
+
+    nextDueDate.setDate(nextDueDate.getDate() + days);
+
+    plan.nextDueDate = nextDueDate.toISOString().slice(0, 10);
+  }
+
+  return { ...workOrder };
+}
 /** Restores seed fixtures. Useful for demo reset after in-session edits. */
 export function resetAssetModuleData(): void {
   assetsStore = seedAssets.map(cloneAsset);
   plansStore = seedPlans.map(clonePlan);
+  serviceHistoryStore = serviceHistory.map(
+    (entry) => ({ ...entry }),
+  );
 }
+mockWorkOrdersStore = mockWorkOrders.map(
+  (workOrder) => ({ ...workOrder }),
+);
