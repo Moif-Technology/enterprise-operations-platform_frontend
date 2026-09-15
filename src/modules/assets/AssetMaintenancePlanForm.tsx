@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useMemo, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
 import Link from "next/link";
 
 import PageHeader from "@/components/ui/PageHeader";
@@ -71,7 +71,21 @@ export default function AssetMaintenancePlanForm({
       status: plan.status,
     };
   });
-
+  useEffect(() => {
+    if (!plan) {
+      return;
+    }
+  
+    setValues({
+      assetId: plan.assetId,
+      planName: plan.planName,
+      frequency: plan.frequency,
+      startDate: plan.startDate,
+      nextDueDate: plan.nextDueDate,
+      checklist: plan.checklist.join("\n"),
+      status: plan.status,
+    });
+  }, [plan]);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [success, setSuccess] = useState(false);
 

@@ -178,15 +178,23 @@ export default function MaintenancePlanList() {
                           {plan.status}
                         </Badge>
                       </td>
-
                       <td className="px-4 py-4">
-                        <Link
-                          href={`/maintenance-plans/${plan.id}`}
-                          className="font-medium text-gray-900 hover:underline"
-                        >
-                          View
-                        </Link>
-                      </td>
+  <div className="flex items-center gap-3">
+    <Link
+      href={`/maintenance-plans/${plan.id}`}
+      className="font-medium text-gray-900 hover:underline"
+    >
+      View
+    </Link>
+
+    <Link
+      href={`/maintenance-plans/${plan.id}/edit`}
+      className="font-medium text-gray-900 hover:underline"
+    >
+      Edit
+    </Link>
+  </div>
+</td>
                     </tr>
                   );
                 })}
