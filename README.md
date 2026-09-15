@@ -4,6 +4,8 @@ Frontend starter for the Enterprise Operations Platform.
 
 ## First Priority
 
+Arshidha's current assignment is [Module 03 - Customers, Sites, Contracts and AMC](docs/assignments/ARSHIDHA_MODULE_03.md) on `sabeeh`, following her submitted Module 02 implementation. Use Module 03 for the next task; the Module 02 instructions below are historical.
+
 Arshidha's active next task is [Module 02 - Assets and Basic Preventive Maintenance](docs/assignments/ARSHIDHA_MODULE_02.md), available on branch `sabeeh`. Module 01 is complete per the project owner. The assignment includes setup commands, full scope, acceptance criteria and a copy-paste prompt for Claude/Codex. Historical Module 01 restrictions below apply to the foundation assignment, not her newly assigned scope.
 
 Build the design system and app foundation first. Do not start full module screens until the shared shell, navigation, buttons, badges, tables, forms, and states are stable.
