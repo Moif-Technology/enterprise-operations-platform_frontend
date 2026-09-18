@@ -30,13 +30,7 @@ const [notes, setNotes] = useState(customer?.notes ?? "");
 const [error, setError] = useState("");
 const [saving, setSaving] = useState(false);
 
-const existingCodes = useMemo(
-() =>
-getCustomers()
-.filter((item) => item.id !== customer?.id)
-.map((item) => item.code.toLowerCase()),
-[customer?.id],
-);
+
 
 function handleSubmit(event: FormEvent<HTMLFormElement>) {
 event.preventDefault();
@@ -55,6 +49,10 @@ if (!trimmedName || !trimmedCode || !trimmedContact) {
   setError("Name, code, and primary contact are required.");
   return;
 }
+
+const existingCodes = getCustomers()
+  .filter((item) => item.id !== customer?.id)
+  .map((item) => item.code.toLowerCase());
 
 if (existingCodes.includes(trimmedCode.toLowerCase())) {
   setError("Customer code must be unique.");

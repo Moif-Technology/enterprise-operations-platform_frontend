@@ -43,12 +43,6 @@ function handleSubmit(event: FormEvent<HTMLFormElement>) {
   const trimmedCode = code.trim();
   const trimmedAddress = address.trim();
 
-  console.log("SITE SUBMIT DEBUG", {
-    customerId,
-    code: trimmedCode,
-    selectedCustomer: customers.find((item) => item.id === customerId),
-    sites,
-  });
 
   if (!trimmedName || !trimmedCode || !customerId || !trimmedAddress) {
     setError(
@@ -64,12 +58,7 @@ function handleSubmit(event: FormEvent<HTMLFormElement>) {
       item.code.toLowerCase() === trimmedCode.toLowerCase()
   );
 
-  console.log("DUPLICATE CHECK DEBUG", {
-    duplicate,
-    customerId,
-    code: trimmedCode,
-  });
-
+  
   if (duplicate) {
     setError("Site code must be unique within the selected customer.");
     return;
@@ -114,11 +103,11 @@ if (site && site.customerId !== customerId) {
       : {}),
   };
 
-  console.log("SAVING SITE DEBUG", savedSite);
+  
 
   const result = saveSite(savedSite);
 
-  console.log("SITE SAVED DEBUG", result);
+ 
 
   router.push(`/sites/${result.id}`);
 }
