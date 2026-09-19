@@ -104,7 +104,52 @@ function cloneContract(contract: Contract): Contract {
     assetIds: [...contract.assetIds],
   };
 }
+export function getContractLifecycleStatus(
+  contract: Contract,
+  today = new Date(),
+): "scheduled" | "active" | "expired" | "draft" | "cancelled" {
+  if (contract.status === "draft" || contract.status === "cancelled") {
+    return contract.status;
+  }
 
+  const currentDate = today.toISOString().slice(0, 10);
+
+  if (currentDate < contract.startDate) {
+    return "scheduled";
+  }
+
+  if (currentDate <= contract.endDate) {
+    return "active";
+  }
+
+  return "expired";
+}
+export function isContractExpiringWithin30Days(
+  contract: Contract,
+  today = new Date(),
+): boolean {
+  if (contract.status !== "active") {
+    return false;
+  }
+
+  const currentDate = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    today.getDate(),
+  );
+
+  const endDate = new Date(
+    Number(contract.endDate.slice(0, 4)),
+    Number(contract.endDate.slice(5, 7)) - 1,
+    Number(contract.endDate.slice(8, 10)),
+  );
+
+  const diffInDays =
+    (endDate.getTime() - currentDate.getTime()) /
+    (1000 * 60 * 60 * 24);
+
+  return diffInDays >= 0 && diffInDays <= 30;
+}
 export function getContracts(): Contract[] {
   return contractsStore.map(cloneContract);
 }

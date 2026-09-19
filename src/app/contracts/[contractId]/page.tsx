@@ -19,6 +19,7 @@ export default async function ContractDetailPage({
 }: ContractDetailPageProps) {
   const { contractId } = await params;
   const contract = getContractById(contractId);
+
   const customer = contract
   ? getCustomerById(contract.customerId)
   : undefined;
@@ -73,11 +74,24 @@ export default async function ContractDetailPage({
     {customer?.name ?? "Unknown customer"}
   </p>
 </div>
-          <Link href="/contracts">
+<div className="flex items-center gap-2">
+  <Link href={`/contracts/${contract.id}/edit`}>
+    <Button>Edit Contract</Button>
+  </Link>
+
+<Link href={`/contracts/${contract.id}/renew`}>
   <Button variant="secondary">
-    Back to Contracts
+    Renew
   </Button>
 </Link>
+
+
+  <Link href="/contracts">
+    <Button variant="secondary">
+      Back to Contracts
+    </Button>
+  </Link>
+</div>
         </div>
 
         <Panel title="Contract Details">
@@ -147,37 +161,9 @@ export default async function ContractDetailPage({
                 {contract.endDate}
               </p>
             </div>
-            <div>
-  <label
-    htmlFor="serviceScope"
-    className="mb-2 block text-sm font-medium text-slate-700"
-  >
-    Service Scope
-  </label>
-  <textarea
-    id="serviceScope"
-    name="serviceScope"
-    rows={3}
-    placeholder="Describe the services covered by this contract"
-    className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm outline-none"
-  />
-</div>
+          
 
-<div>
-  <label
-    htmlFor="exclusions"
-    className="mb-2 block text-sm font-medium text-slate-700"
-  >
-    Exclusions
-  </label>
-  <textarea
-    id="exclusions"
-    name="exclusions"
-    rows={3}
-    placeholder="Describe any excluded services or items"
-    className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm outline-none"
-  />
-</div>
+
 <div>
   <label
     htmlFor="visitFrequency"

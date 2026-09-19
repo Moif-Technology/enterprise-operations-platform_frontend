@@ -22,14 +22,30 @@ import {
 import {
   getContracts,
   getCustomers,
+  getContractLifecycleStatus,
+  isContractExpiringWithin30Days,
 } from "@/modules/assets/service";
-
 import type {
   Contract,
   ContractStatus,
   ContractType,
   Customer,
 } from "@/modules/assets/types";
+
+function getLifecycleLabel(status: ReturnType<typeof getContractLifecycleStatus>) {
+  switch (status) {
+    case "scheduled":
+      return "Scheduled";
+    case "active":
+      return "Active";
+    case "expired":
+      return "Expired";
+    case "draft":
+      return "Draft";
+    case "cancelled":
+      return "Cancelled";
+  }
+}
 
 const CONTRACT_TYPES: ContractType[] = [
   "AMC",
@@ -114,26 +130,25 @@ export function ContractList() {
 
   const filteredContracts = useMemo(() => {
     const normalizedSearch = search.trim().toLowerCase();
-
+  
     return contracts.filter((contract) => {
       const matchesSearch =
         !normalizedSearch ||
-        contract.contractNumber
-          .toLowerCase()
-          .includes(normalizedSearch) ||
-        contract.title
-          .toLowerCase()
-          .includes(normalizedSearch);
-
+        contract.contractNumber.toLowerCase().includes(normalizedSearch) ||
+        contract.title.toLowerCase().includes(normalizedSearch);
+  
       const matchesCustomer =
         !customerId || contract.customerId === customerId;
-
+  
       const matchesType =
         !type || contract.type === type;
-
+  
       const matchesStatus =
-        !status || contract.status === status;
-
+        !status ||
+        (status === "expiring-soon"
+          ? isContractExpiringWithin30Days(contract)
+          : getContractLifecycleStatus(contract) === status);
+  
       return (
         matchesSearch &&
         matchesCustomer &&
@@ -232,10 +247,11 @@ export function ContractList() {
 >
   <option value="">All statuses</option>
   {CONTRACT_STATUSES.map((contractStatus) => (
-    <option key={contractStatus} value={contractStatus}>
-      {formatStatusLabel(contractStatus)}
-    </option>
-  ))}
+  <option key={contractStatus} value={contractStatus}>
+    {formatStatusLabel(contractStatus)}
+  </option>
+))}
+<option value="expiring-soon">Expiring within 30 days</option>
 </FormField>
 
           {hasActiveFilters && (
@@ -320,11 +336,21 @@ export function ContractList() {
                     </span>
 
                     <span>
-                      <Badge
-                        tone={statusTone[contract.status]}
-                      >
-                        {formatStatusLabel(contract.status)}
-                      </Badge>
+                    <Badge
+  tone={
+    getContractLifecycleStatus(contract) === "active"
+      ? "success"
+      : getContractLifecycleStatus(contract) === "scheduled"
+        ? "info"
+        : getContractLifecycleStatus(contract) === "expired"
+          ? "danger"
+          : getContractLifecycleStatus(contract) === "draft"
+            ? "warning"
+            : "neutral"
+  }
+>
+  {getLifecycleLabel(getContractLifecycleStatus(contract))}
+</Badge>
                     </span>
                   </button>
                 ))}

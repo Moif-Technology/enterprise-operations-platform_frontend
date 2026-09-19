@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 
 import PageHeader from "@/components/ui/PageHeader";
 import { Button, Panel } from "@/components/ui/design-system";
-import { getAssets, getCustomers, getSites, saveSite, } from "@/modules/assets/service";
+import { getAssets, getCustomers, getContracts, getSites, saveSite, } from "@/modules/assets/service";
 import type { Customer, Site } from "@/modules/assets/types";
 
 interface SiteFormProps {
@@ -16,7 +16,15 @@ interface SiteFormProps {
 export default function SiteForm({ site }: SiteFormProps) {
   const router = useRouter();
 
-  const customers = useMemo(() => getCustomers(), []);
+  const customers = useMemo(() => {
+    const allCustomers = getCustomers();
+  
+    return allCustomers.filter(
+      (customer) =>
+        customer.status === "active" ||
+        customer.id === site?.customerId,
+    );
+  }, [site?.customerId]);
   const sites = useMemo(() => getSites(), []);
 
   const [name, setName] = useState(site?.name ?? "");
@@ -73,18 +81,22 @@ function handleSubmit(event: FormEvent<HTMLFormElement>) {
     return;
   }
 
-if (site && site.customerId !== customerId) {
-  const linkedAssets = getAssets().filter(
-    (asset) => asset.siteId === site.id
-  );
-
-  if (linkedAssets.length > 0) {
-    setError("Customer cannot be changed because this site has linked assets.");
-    return;
+  if (site && site.customerId !== customerId) {
+    const linkedAssets = getAssets().filter(
+      (asset) => asset.siteId === site.id,
+    );
+  
+    const linkedContracts = getContracts().filter((contract) =>
+      contract.siteIds.includes(site.id),
+    );
+  
+    if (linkedAssets.length > 0 || linkedContracts.length > 0) {
+      setError(
+        "Customer cannot be changed because this site is linked to assets or contracts.",
+      );
+      return;
+    }
   }
-}
-
-
   const savedSite: Site = {
     id: site?.id ?? `site-${Date.now()}`,
     customerId,
