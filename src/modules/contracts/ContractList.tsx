@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
@@ -59,16 +58,6 @@ const CONTRACT_STATUSES: ContractStatus[] = [
   "expired",
   "cancelled",
 ];
-
-const statusTone: Record<
-  ContractStatus,
-  "neutral" | "success" | "warning" | "danger"
-> = {
-  draft: "warning",
-  active: "success",
-  expired: "danger",
-  cancelled: "neutral",
-};
 
 const formatStatusLabel = (status: ContractStatus) =>
   status.charAt(0).toUpperCase() + status.slice(1);
@@ -196,63 +185,63 @@ export function ContractList() {
         description="Review contract and AMC records."
       >
         <FilterBar>
-        <SearchInput
-  value={search}
-  onChange={(event) => setSearch(event.target.value)}
-  placeholder="Search contract number or title..."
-/>
+          <SearchInput
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            placeholder="Search contract number or title..."
+          />
 
-<FormField
-  label="Customer"
-  name="contract-filter-customer"
-  type="select"
-  selectProps={{
-    value: customerId,
-    onChange: (event) => setCustomerId(event.target.value),
-  }}
->
-  <option value="">All customers</option>
-  {customers.map((customer) => (
-    <option key={customer.id} value={customer.id}>
-      {customer.name}
-    </option>
-  ))}
-</FormField>
-         
+          <FormField
+            label="Customer"
+            name="contract-filter-customer"
+            type="select"
+            selectProps={{
+              value: customerId,
+              onChange: (event) => setCustomerId(event.target.value),
+            }}
+          >
+            <option value="">All customers</option>
+            {customers.map((customer) => (
+              <option key={customer.id} value={customer.id}>
+                {customer.name}
+              </option>
+            ))}
+          </FormField>
+            
+          <FormField
+            label="Type"
+            name="contract-filter-type"
+            type="select"
+            selectProps={{
+              value: type,
+              onChange: (event) => setType(event.target.value),
+            }}
+          >
+            <option value="">All types</option>
+            {CONTRACT_TYPES.map((contractType) => (
+              <option key={contractType} value={contractType}>
+                {contractType}
+              </option>
+            ))}
+          </FormField>
 
-<FormField
-  label="Type"
-  name="contract-filter-type"
-  type="select"
-  selectProps={{
-    value: type,
-    onChange: (event) => setType(event.target.value),
-  }}
->
-  <option value="">All types</option>
-  {CONTRACT_TYPES.map((contractType) => (
-    <option key={contractType} value={contractType}>
-      {contractType}
-    </option>
-  ))}
-</FormField>
-<FormField
-  label="Status"
-  name="contract-filter-status"
-  type="select"
-  selectProps={{
-    value: status,
-    onChange: (event) => setStatus(event.target.value),
-  }}
->
-  <option value="">All statuses</option>
-  {CONTRACT_STATUSES.map((contractStatus) => (
-  <option key={contractStatus} value={contractStatus}>
-    {formatStatusLabel(contractStatus)}
-  </option>
-))}
-<option value="expiring-soon">Expiring within 30 days</option>
-</FormField>
+          <FormField
+            label="Status"
+            name="contract-filter-status"
+            type="select"
+            selectProps={{
+              value: status,
+              onChange: (event) => setStatus(event.target.value),
+            }}
+          >
+            <option value="">All statuses</option>
+            {CONTRACT_STATUSES.map((contractStatus) => (
+              <option key={contractStatus} value={contractStatus}>
+                {formatStatusLabel(contractStatus)}
+              </option>
+            ))}
+            <option value="expiring-soon">Expiring within 30 days</option>
+          </FormField>
 
           {hasActiveFilters && (
             <Button
@@ -271,90 +260,90 @@ export function ContractList() {
             <ErrorState message={error} />
           ) : contracts.length === 0 ? (
             <EmptyState
-            title="No contracts yet"
-            description="Create a contract or AMC record to get started."
-            actionLabel="Create Contract"
-            onAction={() => router.push("/contracts/new")}
-          />
+              title="No contracts yet"
+              description="Create a contract or AMC record to get started."
+              actionLabel="Create Contract"
+              onAction={() => router.push("/contracts/new")}
+            />
           ) : filteredContracts.length === 0 ? (
             <EmptyState
-  title="No matching contracts"
-  description="Try changing your search or filters."
-  actionLabel="Clear filters"
-  onAction={clearFilters}
-/>
+              title="No matching contracts"
+              description="Try changing your search or filters."
+              actionLabel="Clear filters"
+              onAction={clearFilters}
+            />
           ) : (
-            <div className="overflow-x-auto">
-              <div className="min-w-[900px]">
-                <div
-                  className="grid gap-4 border-b border-border px-4 py-3 text-xs font-medium uppercase tracking-wide text-muted-foreground"
-                  style={{
-                    gridTemplateColumns:
-                      "1fr 1.4fr 1.2fr 0.8fr 1fr 1fr 0.8fr",
-                  }}
-                >
-                  <span>Contract number</span>
-                  <span>Title</span>
-                  <span>Customer</span>
-                  <span>Type</span>
-                  <span>Start date</span>
-                  <span>End date</span>
-                  <span>Status</span>
-                </div>
-
-                {filteredContracts.map((contract) => (
-                  <button
-                    key={contract.id}
-                    type="button"
-                    onClick={() => openContract(contract.id)}
-                    className="grid w-full gap-4 border-b border-border px-4 py-4 text-left text-sm transition-colors hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                    style={{
-                      gridTemplateColumns:
-                        "1fr 1.4fr 1.2fr 0.8fr 1fr 1fr 0.8fr",
-                    }}
-                  >
-                    <span className="font-medium">
-                      {contract.contractNumber}
-                    </span>
-
-                    <span>{contract.title}</span>
-
-                    <span>
-                      {customerNameById.get(
-                        contract.customerId,
-                      ) ?? "Unknown customer"}
-                    </span>
-
-                    <span>{contract.type}</span>
-
-                    <span>
-                      {formatDate(contract.startDate)}
-                    </span>
-
-                    <span>
-                      {formatDate(contract.endDate)}
-                    </span>
-
-                    <span>
-                    <Badge
-  tone={
-    getContractLifecycleStatus(contract) === "active"
-      ? "success"
-      : getContractLifecycleStatus(contract) === "scheduled"
-        ? "info"
-        : getContractLifecycleStatus(contract) === "expired"
-          ? "danger"
-          : getContractLifecycleStatus(contract) === "draft"
-            ? "warning"
-            : "neutral"
-  }
->
-  {getLifecycleLabel(getContractLifecycleStatus(contract))}
-</Badge>
-                    </span>
-                  </button>
-                ))}
-              </div>
+            <div className="overflow-x-auto rounded-xl border border-border bg-card shadow-sm">
+              <table className="w-full border-collapse text-left text-sm min-w-[950px] table-fixed">
+                <colgroup>
+                  <col className="w-[14%]" />
+                  <col className="w-[24%]" />
+                  <col className="w-[18%]" />
+                  <col className="w-[10%]" />
+                  <col className="w-[12%]" />
+                  <col className="w-[12%]" />
+                  <col className="w-[10%]" />
+                </colgroup>
+                <thead className="bg-muted/50 text-xs font-semibold uppercase tracking-wider text-muted-foreground border-b border-border">
+                  <tr>
+                    <th className="px-5 py-3.5">Contract number</th>
+                    <th className="px-5 py-3.5">Title</th>
+                    <th className="px-5 py-3.5">Customer</th>
+                    <th className="px-5 py-3.5">Type</th>
+                    <th className="px-5 py-3.5">Start date</th>
+                    <th className="px-5 py-3.5">End date</th>
+                    <th className="px-5 py-3.5">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {filteredContracts.map((contract) => {
+                    const lifecycleStatus = getContractLifecycleStatus(contract);
+                    return (
+                      <tr
+                        key={contract.id}
+                        onClick={() => openContract(contract.id)}
+                        className="cursor-pointer transition-colors hover:bg-muted/40 group"
+                      >
+                        <td className="px-5 py-4 font-medium text-foreground truncate">
+                          {contract.contractNumber}
+                        </td>
+                        <td className="px-5 py-4 text-foreground truncate" title={contract.title}>
+                          {contract.title}
+                        </td>
+                        <td className="px-5 py-4 text-muted-foreground truncate">
+                          {customerNameById.get(contract.customerId) ?? "Unknown customer"}
+                        </td>
+                        <td className="px-5 py-4 text-muted-foreground truncate">
+                          {contract.type}
+                        </td>
+                        <td className="px-5 py-4 text-muted-foreground whitespace-nowrap">
+                          {formatDate(contract.startDate)}
+                        </td>
+                        <td className="px-5 py-4 text-muted-foreground whitespace-nowrap">
+                          {formatDate(contract.endDate)}
+                        </td>
+                        <td className="px-5 py-4 whitespace-nowrap">
+                          <Badge
+                            tone={
+                              lifecycleStatus === "active"
+                                ? "success"
+                                : lifecycleStatus === "scheduled"
+                                ? "info"
+                                : lifecycleStatus === "expired"
+                                ? "danger"
+                                : lifecycleStatus === "draft"
+                                ? "warning"
+                                : "neutral"
+                            }
+                          >
+                            {getLifecycleLabel(lifecycleStatus)}
+                          </Badge>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
             </div>
           )}
         </div>

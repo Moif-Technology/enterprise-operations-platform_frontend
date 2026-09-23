@@ -1,28 +1,25 @@
-
+"use client";
 
 import { Button, Panel } from "@/components/ui/design-system";
-import {
-    getAssetById,
-    getContractById,
-    getCustomerById,
-    getSiteById,
-  } from "@/modules/assets/service";
-import Link from "next/link";
-type ContractDetailPageProps = {
-  params: Promise<{
-    contractId: string;
-  }>;
-};
 
-export default async function ContractDetailPage({
-  params,
-}: ContractDetailPageProps) {
-  const { contractId } = await params;
+import {
+  getAssetById,
+  getContractById,
+  getCustomerById,
+  getSiteById,
+} from "@/modules/assets/service";
+
+import Link from "next/link";
+import { useParams } from "next/navigation";
+
+export default function ContractDetailPage() {
+  const params = useParams<{ contractId: string }>();
+  const contractId = params.contractId;
   const contract = getContractById(contractId);
 
   const customer = contract
-  ? getCustomerById(contract.customerId)
-  : undefined;
+    ? getCustomerById(contract.customerId)
+    : undefined;
   const sites = contract
   ? contract.siteIds
       .map((siteId) => getSiteById(siteId))
@@ -164,21 +161,7 @@ export default async function ContractDetailPage({
           
 
 
-<div>
-  <label
-    htmlFor="visitFrequency"
-    className="mb-2 block text-sm font-medium text-slate-700"
-  >
-    Visit Frequency
-  </label>
-  <input
-    id="visitFrequency"
-    name="visitFrequency"
-    type="text"
-    placeholder="e.g. Monthly"
-    className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm outline-none"
-  />
-</div>
+
 <div className="grid gap-4 md:grid-cols-2">
   <div>
     <label

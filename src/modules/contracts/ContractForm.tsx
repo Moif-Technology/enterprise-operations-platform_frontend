@@ -25,29 +25,32 @@ export default function ContractForm({
 }: ContractFormProps) {
   const router = useRouter();
   const customers = getCustomers().filter(
-    (customer) => customer.status === "active",
+    (customer) =>
+      customer.status === "active" ||
+      customer.id === contract?.customerId,
   );
-
+  
   const [customerId, setCustomerId] = useState(
     contract?.customerId ?? "",
   );
 
-  const [siteId, setSiteId] = useState(
-    contract?.siteIds[0] ?? "",
+  const [siteIds, setSiteIds] = useState<string[]>(
+    contract?.siteIds ?? [],
   );
-
-  const [assetId, setAssetId] = useState(
-    contract?.assetIds[0] ?? "",
+  
+  const [assetIds, setAssetIds] = useState<string[]>(
+    contract?.assetIds ?? [],
   );
 
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-
+  const [isSiteDropdownOpen, setIsSiteDropdownOpen] = useState(false);
+  const [isAssetDropdownOpen, setIsAssetDropdownOpen] = useState(false);
   const sites = customerId
   ? getSitesByCustomerId(customerId).filter(
       (site) =>
         site.status === "active" ||
-        site.id === contract?.siteIds[0],
+      contract?.siteIds.includes(site.id)
     )
   : [];
 
@@ -55,7 +58,7 @@ export default function ContractForm({
     (asset) =>
       asset.status === "active" &&
       asset.customerId === customerId &&
-      (!siteId || asset.siteId === siteId),
+      (!siteIds.length || siteIds.includes(asset.siteId)),
   );
   
   
@@ -120,9 +123,15 @@ const isRenew = Boolean(contract) && mode === "renew";
     if (
       isRenew &&
       contract &&
-      getContracts().some((item) => item.originalContractId === contract.id)
+      getContracts().some(
+        item =>
+          item.originalContractId === contract.id ||
+          item.id === contract.id ||
+          item.originalContractId === contract.originalContractId,
+      )
     ) {
       setError("A renewal draft already exists for this contract.");
+      setIsSubmitting(false);
       return;
     }
     
@@ -138,28 +147,31 @@ const isRenew = Boolean(contract) && mode === "renew";
       return;
     }
 
-    const selectedSite = sites.find(
-      (site) => site.id === siteId,
+    if (!siteIds.length) {
+      setError("At least one site is required.");
+      return;
+    }
+    
+    const invalidSite = siteIds.some(
+      (siteId) => !sites.some((site) => site.id === siteId),
     );
-
-    if (siteId && !selectedSite) {
+    
+    if (invalidSite) {
       setError(
-        "Selected site does not belong to the selected customer.",
+        "One or more selected sites do not belong to the selected customer.",
       );
       return;
     }
-
-    const selectedAsset = assets.find(
-      (asset) => asset.id === assetId,
+    const invalidAsset = assetIds.some(
+      (assetId) => !assets.some((asset) => asset.id === assetId),
     );
-
-    if (assetId && !selectedAsset) {
+    
+    if (invalidAsset) {
       setError(
-        "Selected asset does not match the selected customer or site.",
+        "One or more selected assets do not match the selected customer or site.",
       );
       return;
     }
-
     const valueInput = String(
       formData.get("value") ?? "",
     ).trim();
@@ -196,7 +208,7 @@ const isRenew = Boolean(contract) && mode === "renew";
 
     if (
       responseHours !== undefined &&
-      (!Number.isFinite(responseHours) || responseHours < 0)
+      (!Number.isFinite(responseHours) || responseHours <= 0)
     ) {
       setError(
         "Response time must be a valid non-negative number.",
@@ -206,7 +218,7 @@ const isRenew = Boolean(contract) && mode === "renew";
 
     if (
       resolutionHours !== undefined &&
-      (!Number.isFinite(resolutionHours) || resolutionHours < 0)
+      (!Number.isFinite(resolutionHours) || resolutionHours <= 0)
     ) {
       setError(
         "Resolution time must be a valid non-negative number.",
@@ -232,8 +244,8 @@ const isRenew = Boolean(contract) && mode === "renew";
       contractNumber,
       title,
       customerId,
-      siteIds: siteId ? [siteId] : [],
-      assetIds: assetId ? [assetId] : [],
+      siteIds: siteIds.length ? siteIds : [],
+      assetIds: assetIds.length ? assetIds : [],
       type: type as "AMC" | "Warranty" | "Service",
       startDate,
       endDate,
@@ -292,6 +304,7 @@ const isRenew = Boolean(contract) && mode === "renew";
                 {error}
               </p>
             )}
+            </div>
 
 <div className="grid gap-4 md:grid-cols-2">
   <label className="text-sm font-medium text-slate-700">
@@ -346,8 +359,8 @@ const isRenew = Boolean(contract) && mode === "renew";
       value={customerId}
       onChange={(event) => {
         setCustomerId(event.target.value);
-        setSiteId("");
-        setAssetId("");
+        setSiteIds([]);
+        setAssetIds([]);
       }}
       className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2"
     >
@@ -360,49 +373,120 @@ const isRenew = Boolean(contract) && mode === "renew";
     </select>
   </label>
 
-  <label className="text-sm font-medium text-slate-700">
-    Site
-    <select
-      name="siteId"
-      value={siteId}
-      onChange={(event) => {
-        setSiteId(event.target.value);
-        setAssetId("");
-      }}
+  <div className="text-sm font-medium text-slate-700">
+  <label>Site</label>
+
+  <div className="relative mt-1">
+    <button
+      type="button"
+      onClick={() => setIsSiteDropdownOpen((open) => !open)}
       disabled={!customerId}
-      className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 disabled:bg-slate-100"
+      aria-expanded={isSiteDropdownOpen}
+      className="flex w-full items-center justify-between rounded-md border border-slate-300 bg-white px-3 py-2 text-left disabled:bg-slate-100"
     >
-      <option value="">Site-wide coverage</option>
-      {sites.map((site) => (
-        <option key={site.id} value={site.id}>
-          {site.name} ({site.code})
-        </option>
-      ))}
-    </select>
-  </label>
+      <span>
+        {siteIds.length > 0
+          ? `${siteIds.length} site${siteIds.length > 1 ? "s" : ""} selected`
+          : "Select sites"}
+      </span>
+
+      <span>{isSiteDropdownOpen ? "▲" : "▼"}</span>
+    </button>
+
+    {isSiteDropdownOpen && customerId && (
+      <div className="absolute left-0 right-0 z-20 mt-1 max-h-60 overflow-y-auto rounded-md border border-slate-300 bg-white p-2 shadow-lg">
+        {sites.map((site) => (
+          <label
+            key={site.id}
+            className="flex cursor-pointer items-center gap-2 rounded px-2 py-2 font-normal hover:bg-slate-50"
+          >
+            <input
+              type="checkbox"
+              checked={siteIds.includes(site.id)}
+              onChange={(event) => {
+                setSiteIds((currentSiteIds) =>
+                  event.target.checked
+                    ? [...currentSiteIds, site.id]
+                    : currentSiteIds.filter((id) => id !== site.id),
+                );
+                setAssetIds([]);
+              }}
+            />
+
+            <span>
+              {site.name} ({site.code})
+            </span>
+          </label>
+        ))}
+      </div>
+    )}
+  </div>
 </div>
 <div>
-  <label className="text-sm font-medium text-slate-700">
-    Asset
-    <select
-      name="assetId"
-      value={assetId}
-      onChange={(event) => setAssetId(event.target.value)}
-      disabled={!customerId}
-      className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 disabled:bg-slate-100"
-    >
-      <option value="">Site-wide coverage / No specific asset</option>
-      {assets.map((asset) => (
-        <option key={asset.id} value={asset.id}>
-          {asset.name} ({asset.assetCode})
-        </option>
-      ))}
-    </select>
-  </label>
+<div className="text-sm font-medium text-slate-700">
+  <label>Asset</label>
 
-  <p className="mt-1 text-xs text-slate-500">
-    Leave empty when the contract covers the selected site rather than specific assets.
-  </p>
+  <div className="relative mt-1">
+    <button
+      type="button"
+      onClick={() => setIsAssetDropdownOpen((open) => !open)}
+      disabled={!customerId}
+      aria-expanded={isAssetDropdownOpen}
+      className="flex w-full items-center justify-between rounded-md border border-slate-300 bg-white px-3 py-2 text-left disabled:bg-slate-100"
+    >
+      <span>
+        {assetIds.length > 0
+          ? `${assetIds.length} asset${assetIds.length > 1 ? "s" : ""} selected`
+          : "Select assets"}
+      </span>
+
+      <span>{isAssetDropdownOpen ? "▲" : "▼"}</span>
+    </button>
+
+    {isAssetDropdownOpen && customerId && (
+      <div className="absolute left-0 right-0 z-20 mt-1 max-h-60 overflow-y-auto rounded-md border border-slate-300 bg-white p-2 shadow-lg">
+        {assets.length > 0 ? (
+          assets.map((asset) => (
+            <label
+              key={asset.id}
+              className="flex cursor-pointer items-center gap-2 rounded px-2 py-2 font-normal hover:bg-slate-50"
+            >
+              <input
+                type="checkbox"
+                checked={assetIds.includes(asset.id)}
+                onChange={(event) => {
+                  setAssetIds((currentAssetIds) =>
+                    event.target.checked
+                      ? [...currentAssetIds, asset.id]
+                      : currentAssetIds.filter(
+                          (id) => id !== asset.id,
+                        ),
+                  );
+                }}
+              />
+
+              <span>
+                {asset.name} ({asset.assetCode})
+              </span>
+            </label>
+          ))
+        ) : (
+          <p className="px-2 py-2 text-sm text-slate-500">
+            No eligible assets for the selected customer and site.
+          </p>
+        )}
+      </div>
+    )}
+
+   
+  </div>
+</div>
+
+<p className="mt-1 text-xs text-slate-500">
+  {assetIds.length === 0
+    ? "Coverage: Site-wide"
+    : "Select specific assets covered by this contract."}
+</p>
 </div>
 <div className="grid gap-4 md:grid-cols-2">
   <label className="text-sm font-medium text-slate-700">

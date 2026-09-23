@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, useMemo, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import PageHeader from "@/components/ui/PageHeader";
 import { Button, Panel } from "@/components/ui/design-system";
@@ -13,6 +13,17 @@ customer?: Customer;
 
 export default function CustomerForm({ customer }: CustomerFormProps) {
 const router = useRouter();
+useEffect(() => {
+  const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+    event.preventDefault();
+  };
+
+  window.addEventListener("beforeunload", handleBeforeUnload);
+
+  return () => {
+    window.removeEventListener("beforeunload", handleBeforeUnload);
+  };
+}, []);
 const isEdit = Boolean(customer);
 
 const [name, setName] = useState(customer?.name ?? "");
