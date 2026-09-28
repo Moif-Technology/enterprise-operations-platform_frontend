@@ -4,7 +4,9 @@ Your previous assignment was Module 03 (Customers, Sites, Contracts and AMC). Th
 
 Repository: https://github.com/Moif-Technology/enterprise-operations-platform_frontend.git
 Source branch: sabeeh
-Branch: https://github.com/Moif-Technology/enterprise-operations-platform_frontend/tree/sabeeh
+Source branch URL: https://github.com/Moif-Technology/enterprise-operations-platform_frontend/tree/sabeeh
+Implementation branch: feature/arshidha-module-04-inventory-spare-parts
+PR target: sabeeh
 Full assignment: https://github.com/Moif-Technology/enterprise-operations-platform_frontend/blob/sabeeh/docs/assignments/ARSHIDHA_MODULE_04.md
 
 Copy the following into Claude, Codex, Cursor or another coding agent to start implementation:
@@ -14,6 +16,8 @@ Copy the following into Claude, Codex, Cursor or another coding agent to start i
 Implement Arshidha's Module 04: Inventory and Spare Parts.
 Repository: https://github.com/Moif-Technology/enterprise-operations-platform_frontend.git
 Source branch: sabeeh
+Implementation branch: feature/arshidha-module-04-inventory-spare-parts
+PR target: sabeeh
 Specification: docs/assignments/ARSHIDHA_MODULE_04.md
 
 Fresh setup:
