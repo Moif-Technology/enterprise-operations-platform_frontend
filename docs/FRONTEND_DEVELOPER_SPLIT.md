@@ -2,7 +2,7 @@
 
 ## Current assignment update
 
-Current as of 2026-09-15: Arshidha's next assignment is [Module 03 - Customers, Sites, Contracts and AMC](assignments/ARSHIDHA_MODULE_03.md) on `sabeeh`. Module 02 was her previous assignment; its submitted implementation is the baseline. Her Module 03 numbering is personal and does not mean the roadmap's Scheduling and Dispatch module. The earlier assignment notes below are historical.
+Current as of 2026-09-28: Arshidha's next assignment is [Module 04 - Inventory and Spare Parts](assignments/ARSHIDHA_MODULE_04.md) on `sabeeh`. Module 03 was her previous assignment; its submitted implementation on `feature/arshidha-module-03-customers-contracts` is the baseline. Her Module 04 numbering is personal: this scope maps to roadmap Module 07, not the roadmap's Scheduling and Dispatch module. The [Module 03 assignment](assignments/ARSHIDHA_MODULE_03.md) and the earlier assignment notes below are historical.
 
 Arshidha's Module 01 is complete per the project owner. Her active second assignment is [ARSHIDHA_MODULE_02.md](assignments/ARSHIDHA_MODULE_02.md) on branch `sabeeh`: Assets and Basic Preventive Maintenance. Follow that file for her current scope; the Module-01-only directions below describe the earlier foundation stage. Operations Core ownership remains with Swetha.
 
