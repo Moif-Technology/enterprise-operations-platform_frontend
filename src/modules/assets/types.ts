@@ -22,20 +22,32 @@ export type MockWorkOrderStatus =
   | "in-progress"
   | "completed"
   | "cancelled";
+  export type RecordStatus = "active" | "inactive";
 
-export interface Customer {
-  id: string;
-  name: string;
-  code: string;
-}
-
-export interface Site {
-  id: string;
-  customerId: string;
-  name: string;
-  code: string;
-  address: string;
-}
+  export interface Customer {
+    id: string;
+    name: string;
+    code: string;
+    status: RecordStatus;
+    primaryContact: string;
+    email?: string;
+    phone?: string;
+    address?: string;
+    notes?: string;
+  }
+  
+  export interface Site {
+    id: string;
+    customerId: string;
+    name: string;
+    code: string;
+    address: string;
+    status: RecordStatus;
+    location?: string;
+    contactName?: string;
+    contactPhone?: string;
+  }
+  
 
 export interface Asset {
   id: string;
@@ -97,3 +109,41 @@ export interface MockWorkOrder {
   completedOn?: string;
   notes?: string;
 }
+
+export type ContractType = "AMC" | "Warranty" | "Service";
+
+export type ContractStatus =
+  | "draft"
+  | "active"
+  | "expired"
+  | "cancelled";
+
+export type ContractLifecycleStatus =
+  | "scheduled"
+  | "active"
+  | "expired";
+
+export type ContractCurrency = "INR" | "USD";
+
+export interface Contract {
+  id: string;
+  contractNumber: string;
+  title: string;
+  customerId: string;
+  siteIds: string[];
+  assetIds: string[];
+  type: ContractType;
+  startDate: string;
+  endDate: string;
+  status: ContractStatus;
+  serviceScope: string;
+  exclusions?: string;
+  visitFrequency?: string;
+  value?: number;
+  currency: ContractCurrency;
+  responseHours?: number;
+  resolutionHours?: number;
+  notes?: string;
+  originalContractId?: string;
+}
+

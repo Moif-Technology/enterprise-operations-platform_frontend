@@ -1,6 +1,8 @@
+
 import type {
   Asset,
   AssetDocument,
+  Contract,
   Customer,
   MaintenancePlan,
   MockWorkOrder,
@@ -13,16 +15,22 @@ export const customers: Customer[] = [
     id: "cust-001",
     name: "Harborview Malls",
     code: "HVM",
+    status: "active",
+    primaryContact: "Harborview Facilities Team",
   },
   {
     id: "cust-002",
     name: "Northline Logistics",
     code: "NLL",
+    status: "active",
+    primaryContact: "Northline Operations Team",
   },
   {
     id: "cust-003",
     name: "CityCare Clinics",
     code: "CCC",
+    status: "active",
+    primaryContact: "CityCare Facilities Team",
   },
 ];
 
@@ -33,6 +41,7 @@ export const sites: Site[] = [
     name: "Harborview Central",
     code: "HVM-C",
     address: "120 Market Street, Downtown",
+    status: "active",
   },
   {
     id: "site-002",
@@ -40,6 +49,7 @@ export const sites: Site[] = [
     name: "Harborview East Wing",
     code: "HVM-E",
     address: "88 East Promenade",
+    status: "active",
   },
   {
     id: "site-003",
@@ -47,6 +57,7 @@ export const sites: Site[] = [
     name: "Northline Depot A",
     code: "NLL-A",
     address: "450 Industrial Park Road",
+    status: "active",
   },
   {
     id: "site-004",
@@ -54,6 +65,7 @@ export const sites: Site[] = [
     name: "CityCare Main Campus",
     code: "CCC-M",
     address: "15 Wellness Avenue",
+    status: "active",
   },
 ];
 
@@ -282,3 +294,27 @@ export const mockWorkOrders: MockWorkOrder[] = [
     notes: "Sample completed handoff used by service history.",
   },
 ];
+
+export const contracts: Contract[] = [
+  {
+    id: "contract-001",
+    contractNumber: "AMC-2026-001",
+    title: "Harborview HVAC Annual Maintenance Contract",
+    customerId: "cust-001",
+    siteIds: ["site-001"],
+    assetIds: ["asset-001"],
+    type: "AMC",
+    startDate: "2026-01-01",
+    endDate: "2026-12-31",
+    status: "active",
+    serviceScope: "Monthly preventive maintenance for rooftop AHU-3.",
+    exclusions: "Major component replacement and emergency call-outs.",
+    visitFrequency: "Monthly",
+    value: 120000,
+    currency: "INR",
+    responseHours: 4,
+    resolutionHours: 24,
+    notes: "Sample AMC contract for Module 03.",
+  },
+];
+

@@ -1,15 +1,21 @@
+
+
 import {
   assetDocuments,
   assets as seedAssets,
   customers,
+  contracts,
   maintenancePlans as seedPlans,
   mockWorkOrders,
   serviceHistory,
   sites,
 } from "./mock-data";
+
+
 import type {
   Asset,
   AssetDocument,
+  Contract,
   Customer,
   MaintenancePlan,
   MockWorkOrder,
@@ -17,7 +23,24 @@ import type {
   Site,
 } from "./types";
 
+
+
 /** In-memory copies so save operations persist for the current session only. */
+let customersStore: Customer[] = customers.map((customer) => ({
+  ...customer,
+}));
+
+let sitesStore: Site[] = sites.map((site) => ({
+  ...site,
+}));
+
+let contractsStore: Contract[] = contracts.map((contract) => ({
+  ...contract,
+  siteIds: [...contract.siteIds],
+  assetIds: [...contract.assetIds],
+}));
+
+
 let assetsStore: Asset[] = seedAssets.map((asset) => ({ ...asset }));
 let plansStore: MaintenancePlan[] = seedPlans.map((plan) => ({
   ...plan,
@@ -41,19 +64,136 @@ function clonePlan(plan: MaintenancePlan): MaintenancePlan {
 }
 
 export function getCustomers(): Customer[] {
-  return customers.map((customer) => ({ ...customer }));
+  return customersStore.map((customer) => ({ ...customer }));
+}
+
+export function getCustomerById(id: string): Customer | undefined {
+  const customer = customersStore.find((item) => item.id === id);
+  return customer ? { ...customer } : undefined;
+}
+
+export function saveCustomer(customer: Customer): Customer {
+  const index = customersStore.findIndex((item) => item.id === customer.id);
+
+  if (index >= 0) {
+    customersStore[index] = { ...customer };
+  } else {
+    customersStore = [...customersStore, { ...customer }];
+  }
+
+  return { ...customer };
 }
 
 export function getSites(): Site[] {
-  return sites.map((site) => ({ ...site }));
+  return sitesStore.map((site) => ({ ...site }));
+}
+
+export function getSiteById(id: string): Site | undefined {
+  const site = sitesStore.find((item) => item.id === id);
+  return site ? { ...site } : undefined;
 }
 
 export function getSitesByCustomerId(customerId: string): Site[] {
-  return sites
+  return sitesStore
     .filter((site) => site.customerId === customerId)
     .map((site) => ({ ...site }));
 }
 
+function cloneContract(contract: Contract): Contract {
+  return {
+    ...contract,
+    siteIds: [...contract.siteIds],
+    assetIds: [...contract.assetIds],
+  };
+}
+export function getContractLifecycleStatus(
+  contract: Contract,
+  today = new Date(),
+): "scheduled" | "active" | "expired" | "draft" | "cancelled" {
+  if (contract.status === "draft" || contract.status === "cancelled") {
+    return contract.status;
+  }
+
+  const currentDate = today.toISOString().slice(0, 10);
+
+  if (currentDate < contract.startDate) {
+    return "scheduled";
+  }
+
+  if (currentDate <= contract.endDate) {
+    return "active";
+  }
+
+  return "expired";
+}
+export function isContractExpiringWithin30Days(
+  contract: Contract,
+  today = new Date(),
+): boolean {
+  if (contract.status !== "active") {
+    return false;
+  }
+
+  const currentDate = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    today.getDate(),
+  );
+
+  const endDate = new Date(
+    Number(contract.endDate.slice(0, 4)),
+    Number(contract.endDate.slice(5, 7)) - 1,
+    Number(contract.endDate.slice(8, 10)),
+  );
+
+  const diffInDays =
+    (endDate.getTime() - currentDate.getTime()) /
+    (1000 * 60 * 60 * 24);
+
+  return diffInDays >= 0 && diffInDays <= 30;
+}
+export function getContracts(): Contract[] {
+  return contractsStore.map(cloneContract);
+}
+
+export function getContractById(id: string): Contract | undefined {
+  const contract = contractsStore.find((item) => item.id === id);
+  return contract ? cloneContract(contract) : undefined;
+}
+
+export function getContractsByCustomerId(customerId: string): Contract[] {
+  return contractsStore
+    .filter((contract) => contract.customerId === customerId)
+    .map(cloneContract);
+}
+
+export function saveContract(contract: Contract): Contract {
+  const index = contractsStore.findIndex(
+    (item) => item.id === contract.id,
+  );
+
+  if (index >= 0) {
+    contractsStore[index] = cloneContract(contract);
+  } else {
+    contractsStore = [...contractsStore, cloneContract(contract)];
+  }
+
+  return cloneContract(contract);
+}
+
+
+
+export function saveSite(site: Site): Site {
+  const index = sitesStore.findIndex((item) => item.id === site.id);
+
+  if (index >= 0) {
+    sitesStore[index] = { ...site };
+  } else {
+    sitesStore = [...sitesStore, { ...site }];
+  }
+
+  return { ...site };
+}
 export function getAssets(): Asset[] {
   return assetsStore.map(cloneAsset);
 }
@@ -186,11 +326,22 @@ export function completeMockWorkOrder(
 /** Restores seed fixtures. Useful for demo reset after in-session edits. */
 export function resetAssetModuleData(): void {
   assetsStore = seedAssets.map(cloneAsset);
+
   plansStore = seedPlans.map(clonePlan);
+
   serviceHistoryStore = serviceHistory.map(
     (entry) => ({ ...entry }),
   );
+
+  contractsStore = contracts.map((contract) => ({
+    ...contract,
+    siteIds: [...contract.siteIds],
+    assetIds: [...contract.assetIds],
+  }));
+
+  mockWorkOrdersStore = mockWorkOrders.map(
+    (workOrder) => ({ ...workOrder }),
+  );
 }
-mockWorkOrdersStore = mockWorkOrders.map(
-  (workOrder) => ({ ...workOrder }),
-);
+
+  
