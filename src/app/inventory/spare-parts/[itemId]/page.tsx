@@ -2,7 +2,7 @@ import Link from "next/link";
 
 import PageHeader from "@/components/ui/PageHeader";
 import { Badge, Button, Panel } from "@/components/ui/design-system";
-import { getItemStockSummary, getSparePartById, getStockBalances, getStockLocations } from "@/modules/inventory/service";
+import { getItemStockSummary, getMovements, getSparePartById, getStockBalances, getStockLocations } from "@/modules/inventory/service";
 import { getAssets } from "@/modules/assets/service";
 
 type SparePartDetailPageProps = {
@@ -50,6 +50,9 @@ export default async function SparePartDetailPage({
     (balance) => balance.itemId === item.id,
   );
   const locations = getStockLocations();
+  const recentMovements = getMovements().filter(
+    (movement) => movement.itemId === item.id,
+  ).slice(0, 5);
   const assets = getAssets().filter(
     (asset) => asset.category === item.category,
   );
@@ -278,33 +281,69 @@ export default async function SparePartDetailPage({
         </Panel>
 
         <Panel
-          title="Applicable assets"
-          description="Assets using the same category are shown as a practical reference."
+          title="Recent movements"
+          description="The five most recent stock movements for this spare part."
         >
-          {assets.length === 0 ? (
+          {recentMovements.length === 0 ? (
             <p className="text-sm text-[#647086]">
-              No matching assets are currently recorded.
+              No movements have been recorded for this item.
             </p>
           ) : (
-            <div className="space-y-3">
-              {assets.map((asset) => (
-                <Link
-                  key={asset.id}
-                  href={`/assets/${asset.id}`}
-                  className="block rounded-lg border border-[#dfe4ea] bg-white p-4 hover:border-[#0f766e]"
-                >
-                  <p className="text-sm font-medium text-[#162033]">
-                    {asset.name}
-                  </p>
-                  <p className="mt-1 text-xs text-[#647086]">
-                    {asset.assetCode} · {asset.category}
-                  </p>
-                </Link>
-              ))}
+            <div className="table-shell overflow-x-auto">
+              <div
+                className="table-head"
+                style={{
+                  gridTemplateColumns: "0.9fr 0.9fr 1.3fr 1fr 1.2fr",
+                  minWidth: 850,
+                }}
+              >
+                <span>Date</span>
+                <span>Type</span>
+                <span>Source / destination</span>
+                <span>Quantity</span>
+                <span>Reason</span>
+              </div>
+
+              {recentMovements.map((movement) => {
+                const source = movement.sourceLocationId
+                  ? locations.find(
+                      (location) => location.id === movement.sourceLocationId,
+                    )?.name
+                  : undefined;
+
+                const destination = movement.destinationLocationId
+                  ? locations.find(
+                      (location) =>
+                        location.id === movement.destinationLocationId,
+                    )?.name
+                  : undefined;
+
+                return (
+                  <div
+                    key={movement.id}
+                    className="table-row"
+                    style={{
+                      gridTemplateColumns:
+                        "0.9fr 0.9fr 1.3fr 1fr 1.2fr",
+                      minWidth: 850,
+                    }}
+                  >
+                    <span>{movement.date}</span>
+                    <span className="capitalize">{movement.type}</span>
+                    <span>
+                      {source ?? "—"} → {destination ?? "—"}
+                    </span>
+                    <span>{movement.quantity}</span>
+                    <span>{movement.reason}</span>
+                  </div>
+                );
+              })}
             </div>
           )}
         </Panel>
+
       </div>
     </main>
   );
 }
+

@@ -326,6 +326,7 @@ export function getItemStockSummary(itemId: string): ItemStockSummary | undefine
 }
 
 export function getAllItemStockSummaries(): ItemStockSummary[] {
+  loadClientStore();
   return sparePartsStore
     .map((item) => getItemStockSummary(item.id))
     .filter((summary): summary is ItemStockSummary => Boolean(summary));
