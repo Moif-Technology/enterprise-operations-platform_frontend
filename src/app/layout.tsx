@@ -1,15 +1,22 @@
 import "./globals.css";
 import type { ReactNode } from "react";
+import { Sidebar } from "@/components/layout/Sidebar";
 
 export const metadata = {
   title: "Enterprise Operations Platform",
-  description: "Facility, field service, asset, maintenance, and operations management platform."
+  description:
+    "Facility, field service, asset, maintenance, and operations management platform.",
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <div className="app-shell">
+          <Sidebar />
+          {children}
+        </div>
+      </body>
     </html>
   );
 }

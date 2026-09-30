@@ -1,7 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
-
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/design-system";
 import Link from "next/link";
 
 import PageHeader from "@/components/ui/PageHeader";
@@ -13,6 +14,7 @@ import { getCustomers } from "@/modules/assets/service";
 import type { RecordStatus } from "@/modules/assets/types";
 
 export default function CustomerList() {
+  const router = useRouter();
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<RecordStatus | "all">("all");
 
@@ -37,18 +39,15 @@ export default function CustomerList() {
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        title="Customers"
-        description="Manage customers and their service relationships."
-        action={
-          <Link
-            href="/customers/new"
-            className="btn btn-primary btn-md"
-          >
-            Create Customer
-          </Link>
-        }
-      />
+   <PageHeader
+  title="Customers"
+  description="Manage customers and their service relationships."
+  action={
+    <Button onClick={() => router.push("/customers/new")}>
+      Create Customer
+    </Button>
+  }
+/>
 
       <Panel title="Filters">
         <FilterBar>

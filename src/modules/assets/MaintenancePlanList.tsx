@@ -7,7 +7,7 @@ import PageHeader from "@/components/ui/PageHeader";
 import FilterBar from "@/components/ui/FilterBar";
 import SearchInput from "@/components/ui/SearchInput";
 
-import { Badge, Panel } from "@/components/ui/design-system";
+import { Badge, Button, Panel } from "@/components/ui/design-system";
 
 import {
   getAssets,
@@ -51,13 +51,19 @@ export default function MaintenancePlanList() {
   }, [plans, assets, search, frequency, status]);
 
   return (
-    <div className="space-y-6">
-      <PageHeader
-        title="Maintenance Plans"
-        description="Manage preventive maintenance schedules for registered assets."
-      />
+    
+  <div className="space-y-6">
+    <PageHeader
+  title="Maintenance Plans"
+  description="Manage preventive maintenance schedules for registered assets."
+  action={
+    <Link href="/maintenance-plans/new" className="no-underline">
+      <Button variant="primary">Create</Button>
+    </Link>
+  }
+/>
 
-<Panel title="Filters">
+    <Panel title="Filters">
         <FilterBar>
           <SearchInput
             value={search}
