@@ -9,21 +9,24 @@ type NavItem = {
   href?: string;
   comingSoon?: boolean;
 };
-
 const primaryItems: NavItem[] = [
   { label: "Dashboard", href: "/" },
   { label: "Service Requests", comingSoon: true },
   { label: "Work Orders", comingSoon: true },
   { label: "Assets", href: "/assets" },
-  { label: "Maintenance Plans", href: "/maintenance-plans" },
-
   { label: "Dispatch", comingSoon: true },
   { label: "Customers", href: "/customers" },
   { label: "Sites", href: "/sites" },
   { label: "Contracts", href: "/contracts" },
 ];
 
+ 
+
 const maintenanceItems: NavItem[] = [
+  {
+    label: "Maintenance Plans",
+    href: "/maintenance-plans",
+  },
   {
     label: "Upcoming Maintenance",
     href: "/upcoming-maintenance",
@@ -43,14 +46,24 @@ const comingSoonItems: NavItem[] = [
   { label: "Reports and AI", comingSoon: true },
 ];
 
-function isActivePath(pathname: string, href: string) {
+function isActivePath(
+  pathname: string,
+  href: string,
+  exact = false,
+) {
   if (href === "/") {
     return pathname === "/";
   }
 
+  if (exact) {
+    return pathname === href;
+  }
+
   return pathname === href || pathname.startsWith(`${href}/`);
 }
-
+function isExactActivePath(pathname: string, href: string) {
+  return pathname === href;
+}
 export function Sidebar() {
   const pathname = usePathname();
   const [inventoryOpen, setInventoryOpen] = useState(
@@ -63,9 +76,7 @@ export function Sidebar() {
   const [comingSoonLabel, setComingSoonLabel] = useState<string | null>(null);
 
   const inventoryActive = pathname.startsWith("/inventory");
-  const maintenanceActive =
-  pathname.startsWith("/maintenance-plans") ||
-  pathname.startsWith("/upcoming-maintenance");
+  const maintenanceActive = pathname.startsWith("/maintenance-plans");
   useEffect(() => {
     if (inventoryActive) {
       setInventoryOpen(true);
@@ -131,47 +142,7 @@ export function Sidebar() {
 
         <nav aria-label="Main navigation">
         {primaryItems.map((item) =>
-  item.label === "Maintenance Plans" ? (
-    <div className="sidebar-group" key={item.label}>
-  <button
-    type="button"
-    className={`sidebar-link sidebar-group-toggle ${
-      maintenanceActive ? "sidebar-link-active" : ""
-    }`}
-    aria-expanded={maintenanceOpen}
-    onClick={() => setMaintenanceOpen((open) => !open)}
-  >
-    <span>Maintenance Plans</span>
-    <span aria-hidden="true">
-      {maintenanceOpen ? "-" : "+"}
-    </span>
-  </button>
-
-  {maintenanceOpen && (
-    <div className="sidebar-subnav">
-      {maintenanceItems.map((maintenanceItem) => (
-        <Link
-          key={maintenanceItem.label}
-          href={maintenanceItem.href!}
-          className={`sidebar-link sidebar-subnav-link ${
-            isActivePath(pathname, maintenanceItem.href!)
-              ? "sidebar-link-active"
-              : ""
-          }`}
-          aria-current={
-            isActivePath(pathname, maintenanceItem.href!)
-              ? "page"
-              : undefined
-          }
-        >
-          {maintenanceItem.label}
-        </Link>
-      ))}
-    </div>
-  )}
-
-</div>
-  ) : item.comingSoon ? (
+  item.comingSoon ? (
     <button
       type="button"
       key={item.label}
@@ -196,7 +167,44 @@ export function Sidebar() {
     </Link>
   ),
 )}
+<div className="sidebar-group">
+  <button
+    type="button"
+    className={`sidebar-link sidebar-group-toggle ${
+      maintenanceActive ? "sidebar-link-active" : ""
+    }`}
+    aria-expanded={maintenanceOpen}
+    onClick={() => setMaintenanceOpen((open) => !open)}
+  >
+    <span>Maintenance</span>
+    <span aria-hidden="true">
+      {maintenanceOpen ? "-" : "+"}
+    </span>
+  </button>
 
+  {maintenanceOpen && (
+    <div className="sidebar-subnav">
+      {maintenanceItems.map((maintenanceItem) => (
+        <Link
+          key={maintenanceItem.label}
+          href={maintenanceItem.href!}
+          className={`sidebar-link sidebar-subnav-link ${
+            isActivePath(pathname, maintenanceItem.href!, true)
+              ? "sidebar-link-active"
+              : ""
+          }`}
+          aria-current={
+            isActivePath(pathname, maintenanceItem.href!, true)
+              ? "page"
+              : undefined
+          }
+        >
+          {maintenanceItem.label}
+        </Link>
+      ))}
+    </div>
+  )}
+</div>
           <div className="sidebar-group">
             <button
               type="button"
@@ -217,12 +225,14 @@ export function Sidebar() {
                     key={item.label}
                     href={item.href!}
                     className={`sidebar-link sidebar-subnav-link ${
-                      isActivePath(pathname, item.href!)
+                      isActivePath(pathname, item.href!, true)
                         ? "sidebar-link-active"
                         : ""
                     }`}
                     aria-current={
-                      isActivePath(pathname, item.href!) ? "page" : undefined
+                      isActivePath(pathname, item.href!, true)
+                        ? "page"
+                        : undefined
                     }
                   >
                     {item.label}

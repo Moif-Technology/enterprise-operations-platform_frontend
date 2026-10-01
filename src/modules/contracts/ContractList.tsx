@@ -165,7 +165,7 @@ export function ContractList() {
   };
 
   return (
-    <main className="space-y-6 p-6">
+    <main className="w-full max-w-full space-y-6">
       <PageHeader
         eyebrow="Contracts"
         title="Contracts & AMC"

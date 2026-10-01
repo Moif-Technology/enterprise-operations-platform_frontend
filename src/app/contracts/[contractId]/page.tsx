@@ -32,8 +32,8 @@ export default function ContractDetailPage() {
   : [];
   if (!contract) {
     return (
-      <main className="min-h-screen bg-slate-50 p-6">
-        <div className="mx-auto max-w-6xl space-y-6">
+      <main className="w-full max-w-full">
+        <div className="w-full max-w-full space-y-6">
           <div>
             <h1 className="text-2xl font-semibold text-slate-900">
               Contract Not Found
@@ -54,8 +54,8 @@ export default function ContractDetailPage() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-50 p-6">
-      <div className="mx-auto max-w-6xl space-y-6">
+    <main className="w-full max-w-full">
+      <div className="w-full max-w-full space-y-6">
         <div className="flex items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-semibold text-slate-900">

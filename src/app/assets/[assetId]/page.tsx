@@ -27,8 +27,8 @@ export default async function AssetDetailPage({
 
   if (!asset) {
     return (
-      <main className="min-h-screen bg-[#f6f7f9] px-4 py-6 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-5xl">
+      <main className="w-full max-w-full">
+        <div className="w-full max-w-full">
           <PageHeader
             title="Asset not found"
             description="The requested asset could not be found."
@@ -64,8 +64,8 @@ export default async function AssetDetailPage({
   const workOrders = getMockWorkOrdersByAssetId(asset.id);
 
   return (
-    <main className="min-h-screen bg-[#f6f7f9] px-4 py-6 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-6xl space-y-6">
+    <main className="w-full max-w-full">
+      <div className="w-full max-w-full space-y-6">
         <PageHeader
           title={asset.name}
           description={`${asset.assetCode} · ${asset.category}`}

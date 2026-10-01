@@ -20,8 +20,8 @@ export default async function SparePartDetailPage({
 
   if (!item) {
     return (
-      <main className="min-h-screen bg-[#f6f7f9] px-4 py-6 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-5xl">
+      <main className="w-full max-w-full">
+        <div className="w-full max-w-full">
           <PageHeader
             title="Spare part not found"
             description="The requested spare part does not exist."
@@ -58,8 +58,8 @@ export default async function SparePartDetailPage({
   );
 
   return (
-    <main className="min-h-screen bg-[#f6f7f9] px-4 py-6 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-5xl space-y-6">
+    <main className="w-full max-w-full">
+      <div className="w-full max-w-full space-y-6">
         <PageHeader
           eyebrow="Inventory"
           title={item.name}

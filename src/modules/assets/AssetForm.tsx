@@ -215,8 +215,8 @@ export default function AssetForm({
   };
 
   return (
-    <main className="min-h-screen bg-[#f6f7f9] px-4 py-6 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-4xl space-y-6">
+    <main className="w-full max-w-full">
+      <div className="w-full max-w-full space-y-6">
         <PageHeader
           title={mode === "edit" ? "Edit Asset" : "Register Asset"}
           description={

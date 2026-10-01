@@ -22,7 +22,7 @@ export default async function EditContractPage({
   return (
     <main
       className="content"
-      style={{ maxWidth: 1200, margin: "0 auto", padding: 24 }}
+      style={{ width: "100%", maxWidth: "100%" }}
     >
       <ContractForm contract={contract} />
     </main>
