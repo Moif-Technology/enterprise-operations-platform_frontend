@@ -15,7 +15,7 @@ const primaryItems: NavItem[] = [
   { label: "Service Requests", comingSoon: true },
   { label: "Work Orders", comingSoon: true },
   { label: "Assets", href: "/assets" },
-  { label: "Maintenance", href: "/maintenance-plans" },
+  { label: "Maintenance Plans", href: "/maintenance-plans" },
 
   { label: "Dispatch", comingSoon: true },
   { label: "Customers", href: "/customers" },
@@ -26,7 +26,7 @@ const primaryItems: NavItem[] = [
 const maintenanceItems: NavItem[] = [
   {
     label: "Upcoming Maintenance",
-    href: "/maintenance-plans/upcoming",
+    href: "/upcoming-maintenance",
   },
 ];
 const inventoryItems: NavItem[] = [
@@ -64,7 +64,8 @@ export function Sidebar() {
 
   const inventoryActive = pathname.startsWith("/inventory");
   const maintenanceActive =
-  pathname.startsWith("/maintenance-plans");
+  pathname.startsWith("/maintenance-plans") ||
+  pathname.startsWith("/upcoming-maintenance");
   useEffect(() => {
     if (inventoryActive) {
       setInventoryOpen(true);
