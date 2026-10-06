@@ -215,8 +215,8 @@ export default function AssetForm({
   };
 
   return (
-    <main className="w-full max-w-full">
-      <div className="w-full max-w-full space-y-6">
+<main className="asset-form-page">
+<div className="asset-form-container">
         <PageHeader
           title={mode === "edit" ? "Edit Asset" : "Register Asset"}
           description={
@@ -225,9 +225,25 @@ export default function AssetForm({
               : "Register a new asset for customer and site management."
           }
           action={
-            <Link href="/assets">
-              <Button variant="secondary">Cancel</Button>
-            </Link>
+            <>
+              <Link href="/assets">
+                <Button
+                  variant="secondary"
+                  type="button"
+                >
+                  Cancel
+                </Button>
+              </Link>
+
+              <Button
+  type="submit"
+  form="asset-form"
+>
+  {mode === "edit"
+    ? "Save Changes"
+    : "Register Asset"}
+</Button>
+            </>
           }
         />
 
@@ -245,261 +261,237 @@ export default function AssetForm({
           </Panel>
         )}
 
-        <Panel title="Asset information">
-          <form
-            onSubmit={handleSubmit}
-            className="space-y-6"
-          >
-            <div className="grid gap-5 md:grid-cols-2">
-              <FormField
-                label="Asset name"
-                name="name"
-                required
-                error={errors.name}
-                placeholder="e.g. Main Building AC Unit"
-                inputProps={{
-                  value: values.name,
-                  onChange: (event) =>
-                    updateValue("name", event.target.value),
-                }}
-              />
+      
+<form
+  id="asset-form"
+  onSubmit={handleSubmit}
+  className="asset-form"
+>
+            
+<div className="asset-form-top-grid">
+<Panel title="Basic Information">
+  <div className="asset-form-grid">
+    <FormField
+      label="Asset name"
+      name="name"
+      required
+      error={errors.name}
+      placeholder="e.g. Main Building AC Unit"
+      inputProps={{
+        value: values.name,
+        onChange: (event) =>
+          updateValue("name", event.target.value),
+      }}
+    />
 
-              <FormField
-                label="Asset code"
-                name="assetCode"
-                required
-                error={errors.assetCode}
-                placeholder="e.g. AST-001"
-                inputProps={{
-                  value: values.assetCode,
-                  onChange: (event) =>
-                    updateValue("assetCode", event.target.value),
-                }}
-              />
+    <FormField
+      label="Asset code"
+      name="assetCode"
+      required
+      error={errors.assetCode}
+      placeholder="e.g. AST-001"
+      inputProps={{
+        value: values.assetCode,
+        onChange: (event) =>
+          updateValue("assetCode", event.target.value),
+      }}
+    />
 
-              <FormField
-                label="Category"
-                name="category"
-                type="select"
-                required
-                error={errors.category}
-                selectProps={{
-                  value: values.category,
-                  onChange: (event) =>
-                    updateValue("category", event.target.value),
-                }}
-              >
-                <option value="">Select category</option>
+    <FormField
+      label="Category"
+      name="category"
+      type="select"
+      required
+      error={errors.category}
+      selectProps={{
+        value: values.category,
+        onChange: (event) =>
+          updateValue("category", event.target.value),
+      }}
+    >
+      <option value="">Select category</option>
 
-                {categories.map((item) => (
-                  <option key={item} value={item}>
-                    {item}
-                  </option>
-                ))}
-              </FormField>
+      {categories.map((item) => (
+        <option key={item} value={item}>
+          {item}
+        </option>
+      ))}
+    </FormField>
 
-              <FormField
-                label="Status"
-                name="status"
-                type="select"
-                required
-                selectProps={{
-                  value: values.status,
-                  onChange: (event) =>
-                    updateValue(
-                      "status",
-                      event.target.value as AssetStatus,
-                    ),
-                }}
-              >
-                {statuses.map((item) => (
-                  <option key={item} value={item}>
-                    {item}
-                  </option>
-                ))}
-              </FormField>
+    <FormField
+      label="Status"
+      name="status"
+      type="select"
+      required
+      selectProps={{
+        value: values.status,
+        onChange: (event) =>
+          updateValue(
+            "status",
+            event.target.value as AssetStatus,
+          ),
+      }}
+    >
+      {statuses.map((item) => (
+        <option key={item} value={item}>
+          {item}
+        </option>
+      ))}
+    </FormField>
+  </div>
+</Panel>
 
-              <FormField
-                label="Customer"
-                name="customerId"
-                type="select"
-                required
-                error={errors.customerId}
-                selectProps={{
-                  value: values.customerId,
-                  onChange: (event) => {
-                    const nextCustomerId =
-                      event.target.value;
+<Panel title="Assignment & Location">
+    <div className="asset-form-grid">
+      <FormField
+        label="Customer"
+        name="customerId"
+        type="select"
+        required
+        error={errors.customerId}
+        selectProps={{
+          value: values.customerId,
+          onChange: (event) => {
+            const nextCustomerId = event.target.value;
 
-                    setValues((current) => ({
-                      ...current,
-                      customerId: nextCustomerId,
-                      siteId: "",
-                    }));
+            setValues((current) => ({
+              ...current,
+              customerId: nextCustomerId,
+              siteId: "",
+            }));
 
-                    setErrors((current) => ({
-                      ...current,
-                      customerId: "",
-                      siteId: "",
-                    }));
+            setErrors((current) => ({
+              ...current,
+              customerId: "",
+              siteId: "",
+            }));
 
-                    setSuccess(false);
-                  },
-                }}
-              >
-                <option value="">Select customer</option>
+            setSuccess(false);
+          },
+        }}
+      >
+        <option value="">Select customer</option>
 
-                {customers.map((customer) => (
-                  <option
-                    key={customer.id}
-                    value={customer.id}
-                  >
-                    {customer.name}
-                  </option>
-                ))}
-              </FormField>
+        {customers.map((customer) => (
+          <option key={customer.id} value={customer.id}>
+            {customer.name}
+          </option>
+        ))}
+      </FormField>
 
-              <FormField
-                label="Site"
-                name="siteId"
-                type="select"
-                required
-                error={errors.siteId}
-                disabled={!values.customerId}
-                selectProps={{
-                  value: values.siteId,
-                  onChange: (event) =>
-                    updateValue(
-                      "siteId",
-                      event.target.value,
-                    ),
-                }}
-              >
-                <option value="">
-                  {values.customerId
-                    ? "Select site"
-                    : "Select customer first"}
-                </option>
+      <FormField
+        label="Site"
+        name="siteId"
+        type="select"
+        required
+        error={errors.siteId}
+        disabled={!values.customerId}
+        selectProps={{
+          value: values.siteId,
+          onChange: (event) =>
+            updateValue("siteId", event.target.value),
+        }}
+      >
+        <option value="">
+          {values.customerId
+            ? "Select site"
+            : "Select customer first"}
+        </option>
 
-                {availableSites.map((site) => (
-                  <option key={site.id} value={site.id}>
-                    {site.name}
-                  </option>
-                ))}
-              </FormField>
+        {availableSites.map((site) => (
+          <option key={site.id} value={site.id}>
+            {site.name}
+          </option>
+        ))}
+      </FormField>
 
-              <FormField
-                label="Location"
-                name="location"
-                required
-                error={errors.location}
-                placeholder="e.g. Ground floor plant room"
-                inputProps={{
-                  value: values.location,
-                  onChange: (event) =>
-                    updateValue(
-                      "location",
-                      event.target.value,
-                    ),
-                }}
-              />
+      <div className="asset-form-full-width">
+        <FormField
+          label="Location"
+          name="location"
+          required
+          error={errors.location}
+          placeholder="e.g. Ground floor plant room"
+          inputProps={{
+            value: values.location,
+            onChange: (event) =>
+              updateValue("location", event.target.value),
+          }}
+        />
+      </div>
+    </div>
+  </Panel>
+</div>
 
-              <FormField
-                label="Serial number"
-                name="serialNumber"
-                placeholder="Optional"
-                inputProps={{
-                  value: values.serialNumber,
-                  onChange: (event) =>
-                    updateValue(
-                      "serialNumber",
-                      event.target.value,
-                    ),
-                }}
-              />
+<Panel title="Technical Details & Warranty">
+  <div className="asset-form-grid">
+    <FormField
+      label="Serial number"
+      name="serialNumber"
+      placeholder="Optional"
+      inputProps={{
+        value: values.serialNumber,
+        onChange: (event) =>
+          updateValue("serialNumber", event.target.value),
+      }}
+    />
 
-              <FormField
-                label="Model"
-                name="model"
-                placeholder="Optional"
-                inputProps={{
-                  value: values.model,
-                  onChange: (event) =>
-                    updateValue(
-                      "model",
-                      event.target.value,
-                    ),
-                }}
-              />
+    <FormField
+      label="Model"
+      name="model"
+      placeholder="Optional"
+      inputProps={{
+        value: values.model,
+        onChange: (event) =>
+          updateValue("model", event.target.value),
+      }}
+    />
 
-              <FormField
-                label="Installation date"
-                name="installationDate"
-                type="input"
-                required
-                error={errors.installationDate}
-                inputProps={{
-                  type: "date",
-                  value: values.installationDate,
-                  onChange: (event) =>
-                    updateValue(
-                      "installationDate",
-                      event.target.value,
-                    ),
-                }}
-              />
+    <FormField
+      label="Installation date"
+      name="installationDate"
+      type="input"
+      required
+      error={errors.installationDate}
+      inputProps={{
+        type: "date",
+        value: values.installationDate,
+        onChange: (event) =>
+          updateValue("installationDate", event.target.value),
+      }}
+    />
 
-              <FormField
-                label="Warranty expiry"
-                name="warrantyExpiry"
-                type="input"
-                required
-                error={errors.warrantyExpiry}
-                inputProps={{
-                  type: "date",
-                  value: values.warrantyExpiry,
-                  onChange: (event) =>
-                    updateValue(
-                      "warrantyExpiry",
-                      event.target.value,
-                    ),
-                }}
-              />
-            </div>
+    <FormField
+      label="Warranty expiry"
+      name="warrantyExpiry"
+      type="input"
+      required
+      error={errors.warrantyExpiry}
+      inputProps={{
+        type: "date",
+        value: values.warrantyExpiry,
+        onChange: (event) =>
+          updateValue("warrantyExpiry", event.target.value),
+      }}
+    />
 
-            <FormField
-              label="Notes"
-              name="notes"
-              type="textarea"
-              placeholder="Optional notes about the asset"
-              textareaProps={{
-                value: values.notes,
-                onChange: (event) =>
-                  updateValue(
-                    "notes",
-                    event.target.value,
-                  ),
-              }}
-            />
-
-            <div className="flex justify-end gap-3 border-t border-[#dfe4ea] pt-5">
-              <Link href="/assets">
-                <Button
-                  variant="secondary"
-                  type="button"
-                >
-                  Cancel
-                </Button>
-              </Link>
-
-              <Button type="submit">
-                {mode === "edit"
-                  ? "Save Changes"
-                  : "Register Asset"}
-              </Button>
-            </div>
-          </form>
-        </Panel>
+    <div className="asset-form-full-width">
+      <FormField
+        label="Notes"
+        name="notes"
+        type="textarea"
+        placeholder="Optional notes about the asset"
+        textareaProps={{
+          value: values.notes,
+          onChange: (event) =>
+            updateValue("notes", event.target.value),
+        }}
+      />
+    </div>
+  </div>
+</Panel>
+           
+        </form>
       </div>
     </main>
   );

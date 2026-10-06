@@ -2,13 +2,12 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/design-system";
 import Link from "next/link";
 
 import PageHeader from "@/components/ui/PageHeader";
 import FilterBar from "@/components/ui/FilterBar";
 import SearchInput from "@/components/ui/SearchInput";
-import { Badge, Panel } from "@/components/ui/design-system";
+import { Badge, Button } from "@/components/ui/design-system";
 
 import { getCustomers } from "@/modules/assets/service";
 import type { RecordStatus } from "@/modules/assets/types";
@@ -43,125 +42,146 @@ export default function CustomerList() {
   title="Customers"
   description="Manage customers and their service relationships."
   action={
-    <Button onClick={() => router.push("/customers/new")}>
-      Create Customer
-    </Button>
+    <Button
+    size="sm"
+    onClick={() => router.push("/customers/new")}
+  >
+    <span aria-hidden="true"></span>
+    Create Customer
+  </Button>
   }
 />
 
-      <Panel title="Filters">
-        <FilterBar>
-          <SearchInput
-            value={search}
-            onChange={(event) => setSearch(event.target.value)}
-            placeholder="Search customers, codes, or contacts..."
-          />
+<FilterBar>
+  <SearchInput
+    value={search}
+    onChange={(event) => setSearch(event.target.value)}
+    placeholder="Search customer name, code, or contact..."
+    className="customers-search"
+  />
 
-          <select
-            value={status}
-            onChange={(event) =>
-              setStatus(event.target.value as RecordStatus | "all")
-            }
-            className="h-10 rounded-md border border-gray-300 bg-white px-3 text-sm"
-          >
-            <option value="all">All statuses</option>
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
-          </select>
-        </FilterBar>
-      </Panel>
+  <select
+    value={status}
+    onChange={(event) =>
+      setStatus(event.target.value as RecordStatus | "all")
+    }
+    className="customers-status-filter"
+    aria-label="Filter customers by status"
+  >
+    <option value="all">All statuses</option>
+    <option value="active">Active</option>
+    <option value="inactive">Inactive</option>
+  </select>
+</FilterBar>
 
-      <Panel title="Customers">
-        {filteredCustomers.length === 0 ? (
-          <div className="py-12 text-center">
-            <h3 className="text-base font-semibold text-gray-900">
-              No customers found
-            </h3>
+<div className="customers-table">
+  {filteredCustomers.length === 0 ? (
+    <div className="customers-empty-state">
+      <h3>No customers found</h3>
+      <p>Try changing your search or filters.</p>
+    </div>
+  ) : (
+    <div className="customers-table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>CUSTOMER</th>
+            <th>CODE</th>
+            <th>PRIMARY CONTACT</th>
+            <th>EMAIL</th>
+            <th>STATUS</th>
+            <th>ACTIONS</th>
+          </tr>
+        </thead>
 
-            <p className="mt-1 text-sm text-gray-500">
-              Try changing your search or filters.
-            </p>
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[800px] text-left text-sm">
-              <thead>
-                <tr className="border-b border-gray-200 text-xs uppercase tracking-wide text-gray-500">
-                  <th className="px-4 py-3 font-medium">Customer</th>
-                  <th className="px-4 py-3 font-medium">Code</th>
-                  <th className="px-4 py-3 font-medium">
-                    Primary Contact
-                  </th>
-                  <th className="px-4 py-3 font-medium">Email</th>
-                  <th className="px-4 py-3 font-medium">Status</th>
-                  <th className="px-4 py-3 font-medium">Action</th>
-                </tr>
-              </thead>
+        <tbody>
+          {filteredCustomers.map((customer) => (
+            <tr key={customer.id}>
+              <td>
+                <div className="customers-name">
+                  {customer.name}
+                </div>
+                <div className="customers-id">
+                  {customer.id}
+                </div>
+              </td>
 
-              <tbody>
-                {filteredCustomers.map((customer) => (
-                  <tr
-                    key={customer.id}
-                    className="border-b border-gray-100 last:border-0"
+              <td>
+                <span className="customers-code">
+                  {customer.code}
+                </span>
+              </td>
+
+              <td>{customer.primaryContact || "—"}</td>
+
+              <td>{customer.email || "—"}</td>
+
+              <td>
+                <Badge
+                  tone={
+                    customer.status === "active"
+                      ? "success"
+                      : "neutral"
+                  }
+                >
+                  {customer.status}
+                </Badge>
+              </td>
+
+              <td>
+                <div className="customer-row-actions">
+                  <Link
+                    href={`/customers/${customer.id}`}
+                    className="customer-icon-button"
+                    aria-label={`View ${customer.name}`}
+                    title="View customer"
                   >
-                    <td className="px-4 py-4">
-                      <div className="font-medium text-gray-900">
-                        {customer.name}
-                      </div>
+                    <svg
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
+                      <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z" />
+                      <circle cx="12" cy="12" r="2.5" />
+                    </svg>
+                  </Link>
 
-                      <div className="mt-1 text-xs text-gray-500">
-                        {customer.id}
-                      </div>
-                    </td>
-
-                    <td className="px-4 py-4 text-gray-700">
-                      {customer.code}
-                    </td>
-
-                    <td className="px-4 py-4 text-gray-700">
-                      {customer.primaryContact}
-                    </td>
-
-                    <td className="px-4 py-4 text-gray-700">
-                      {customer.email || "—"}
-                    </td>
-
-                    <td className="px-4 py-4">
-                      <Badge
-                        tone={
-                          customer.status === "active"
-                            ? "success"
-                            : "neutral"
-                        }
-                      >
-                        {customer.status}
-                      </Badge>
-                    </td>
-
-                    <td className="px-4 py-4">
-                      <div className="flex items-center gap-3">
-                        <Link
-                          href={`/customers/${customer.id}`}
-                          className="font-medium text-gray-900 hover:underline"
-                        >
-                          View
-                        </Link>
-
-                        <Link
-                          href={`/customers/${customer.id}/edit`}
-                          className="font-medium text-gray-900 hover:underline"
-                        >
-                          Edit
-                        </Link>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </Panel>
+                  <Link
+                    href={`/customers/${customer.id}/edit`}
+                    className="customer-icon-button"
+                    aria-label={`Edit ${customer.name}`}
+                    title="Edit customer"
+                  >
+                    <svg
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
+                    
+                      <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z" />
+                    </svg>
+                  </Link>
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )}
+</div>
     </div>
   );
 }

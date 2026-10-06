@@ -30,6 +30,43 @@ import type {
   Site,
 } from "@/modules/assets/types";
 
+function EyeIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      width="16"
+      height="16"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z" />
+      <circle cx="12" cy="12" r="2.5" />
+    </svg>
+  );
+}
+
+function PencilIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      width="16"
+      height="16"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L8 18l-4 1 1-4Z" />
+    </svg>
+  );
+}
+
 type ListStatus = "loading" | "ready" | "error";
 
 const ASSET_CATEGORIES: AssetCategory[] = [
@@ -207,108 +244,125 @@ export default function AssetList() {
 
   return (
     <section>
-      <PageHeader
-        eyebrow="Assets"
-        title="Asset registry"
-        description="Search and filter registered assets by customer, site, category, and status."
-        action={
-          <Button onClick={() => router.push("/assets/new")}>
-            Register Asset
-          </Button>
-        }
-      />
+    <PageHeader
+  title="Asset Registry"
+  description="Search and filter registered assets across customers, sites, and status."
+  action={
+    <Button onClick={() => router.push("/assets/new")}>
+      Register Asset
+    </Button>
+  }
+  secondaryAction={
+    <button
+      type="button"
+      className="asset-refresh-button"
+      onClick={() => window.location.reload()}
+      aria-label="Refresh assets"
+      title="Refresh assets"
+    >
+      ↻
+    </button>
+  }
+/>
 
-      <Panel
-        title="Assets"
-        description="Sample registry data for Module 02. Refreshing the page resets in-memory edits."
-      >
-        <FilterBar
-          action={
-            <Button variant="secondary" size="sm" onClick={clearFilters}>
-              Clear filters
-            </Button>
-          }
-        >
-          <SearchInput
-            id="asset-search"
-            label="Search"
-            placeholder="Search name, code, or serial..."
-            value={search}
-            onChange={(event) => setSearch(event.target.value)}
-            aria-label="Search assets by name, code, or serial number"
-          />
+     
+<FilterBar
+  action={
+    search ||
+    customerId !== "all" ||
+    siteId !== "all" ||
+    category !== "all" ||
+    status !== "all" ? (
+      <button
+      type="button"
+      className="filter-reset"
+      onClick={clearFilters}
+    >
+      Clear filters
+    </button>
+    ) : undefined
+  }
+>
+  <SearchInput
+    id="asset-search"
+    className="asset-search"
+    placeholder="Search name, code, or serial..."
+    value={search}
+    onChange={(event) => setSearch(event.target.value)}
+    aria-label="Search assets by name, code, or serial number"
+  />
 
-          <FormField
-            label="Customer"
-            name="asset-filter-customer"
-            type="select"
-            selectProps={{
-              value: customerId,
-              onChange: (event) => {
-                setCustomerId(event.target.value);
-                setSiteId("all");
-              },
-            }}
-          >
-            <option value="all">All customers</option>
-            {customers.map((customer) => (
-              <option key={customer.id} value={customer.id}>
-                {customer.name}
-              </option>
-            ))}
-          </FormField>
+  <FormField
+    label="Customer"
+    name="asset-filter-customer"
+    type="select"
+    selectProps={{
+      value: customerId,
+      onChange: (event) => {
+        setCustomerId(event.target.value);
+        setSiteId("all");
+      },
+    }}
+  >
+    <option value="all">All customers</option>
+    {customers.map((customer) => (
+      <option key={customer.id} value={customer.id}>
+        {customer.name}
+      </option>
+    ))}
+  </FormField>
 
-          <FormField
-            label="Site"
-            name="asset-filter-site"
-            type="select"
-            selectProps={{
-              value: siteId,
-              onChange: (event) => setSiteId(event.target.value),
-            }}
-          >
-            <option value="all">All sites</option>
-            {availableSites.map((site) => (
-              <option key={site.id} value={site.id}>
-                {site.name}
-              </option>
-            ))}
-          </FormField>
+  <FormField
+    label="Site"
+    name="asset-filter-site"
+    type="select"
+    selectProps={{
+      value: siteId,
+      onChange: (event) => setSiteId(event.target.value),
+    }}
+  >
+    <option value="all">All sites</option>
+    {availableSites.map((site) => (
+      <option key={site.id} value={site.id}>
+        {site.name}
+      </option>
+    ))}
+  </FormField>
 
-          <FormField
-            label="Category"
-            name="asset-filter-category"
-            type="select"
-            selectProps={{
-              value: category,
-              onChange: (event) => setCategory(event.target.value),
-            }}
-          >
-            <option value="all">All categories</option>
-            {ASSET_CATEGORIES.map((item) => (
-              <option key={item} value={item}>
-                {item}
-              </option>
-            ))}
-          </FormField>
+  <FormField
+    label="Category"
+    name="asset-filter-category"
+    type="select"
+    selectProps={{
+      value: category,
+      onChange: (event) => setCategory(event.target.value),
+    }}
+  >
+    <option value="all">All categories</option>
+    {ASSET_CATEGORIES.map((item) => (
+      <option key={item} value={item}>
+        {item}
+      </option>
+    ))}
+  </FormField>
 
-          <FormField
-            label="Status"
-            name="asset-filter-status"
-            type="select"
-            selectProps={{
-              value: status,
-              onChange: (event) => setStatus(event.target.value),
-            }}
-          >
-            <option value="all">All statuses</option>
-            {ASSET_STATUSES.map((item) => (
-              <option key={item} value={item}>
-                {formatStatusLabel(item)}
-              </option>
-            ))}
-          </FormField>
-        </FilterBar>
+  <FormField
+    label="Status"
+    name="asset-filter-status"
+    type="select"
+    selectProps={{
+      value: status,
+      onChange: (event) => setStatus(event.target.value),
+    }}
+  >
+    <option value="all">All statuses</option>
+    {ASSET_STATUSES.map((item) => (
+      <option key={item} value={item}>
+        {formatStatusLabel(item)}
+      </option>
+    ))}
+  </FormField>
+</FilterBar>
 
         <div style={{ marginTop: 16 }}>
           {listStatus === "loading" && (
@@ -385,7 +439,7 @@ export default function AssetList() {
                   }}
                   aria-label={`View details for ${asset.name}`}
                 >
-                  <span>{asset.assetCode}</span>
+                  <span className="asset-code">{asset.assetCode}</span>
                   <span>{asset.name}</span>
                   <span>{asset.category}</span>
                   <span>
@@ -404,20 +458,35 @@ export default function AssetList() {
                     onClick={(event) => event.stopPropagation()}
                     onKeyDown={(event) => event.stopPropagation()}
                   >
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => openAsset(asset.id)}
-                    >
-                      Details
-                    </Button>
+                   <div className="asset-row-actions">
+  <button
+    type="button"
+    className="asset-icon-button asset-icon-button-view"
+    aria-label="View asset details"
+    title="View Details"
+    onClick={() => openAsset(asset.id)}
+  >
+    <EyeIcon />
+  </button>
+
+  <button
+    type="button"
+    className="asset-icon-button asset-icon-button-edit"
+    aria-label="Edit asset"
+    title="Edit Asset"
+    onClick={() => router.push(`/assets/${asset.id}/edit`)}
+  >
+    <PencilIcon />
+
+  </button>
+</div>
                   </span>
                 </div>
               ))}
             </div>
           )}
         </div>
-      </Panel>
+     
     </section>
   );
 }

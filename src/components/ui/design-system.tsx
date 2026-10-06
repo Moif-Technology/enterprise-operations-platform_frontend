@@ -17,6 +17,7 @@ interface ButtonProps {
   loading?: boolean;
   type?: "button" | "submit" | "reset";
   onClick?: () => void;
+  form?: string;    
 }
 
 export function Button({
@@ -27,6 +28,7 @@ export function Button({
   loading = false,
   type = "button",
   onClick,
+  form,
 }: ButtonProps) {
   const isDisabled = disabled || loading;
 
@@ -37,7 +39,8 @@ export function Button({
       disabled={isDisabled}
       onClick={onClick}
       aria-busy={loading}
-    >
+      form={form}
+      >
       {loading ? "Loading..." : children}
     </button>
   );

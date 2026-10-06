@@ -12,7 +12,11 @@ export default function SearchInput({
   ...props
 }: SearchInputProps) {
   return (
-    <div className={`search-input${label ? " search-input-with-label" : ""}`}>
+    <div
+  className={`search-input${label ? " search-input-with-label" : ""}${
+    className ? ` ${className}` : ""
+  }`}
+>
       {label && <label htmlFor={props.id}>{label}</label>}
 
       <div className="search-input-wrapper">

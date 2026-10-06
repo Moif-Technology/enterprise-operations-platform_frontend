@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
@@ -6,11 +5,9 @@ import Link from "next/link";
 
 import PageHeader from "@/components/ui/PageHeader";
 import SearchInput from "@/components/ui/SearchInput";
-import { Badge, Button, Panel } from "@/components/ui/design-system";
-import {
-  getCustomers,
-  getSites,
-} from "@/modules/assets/service";
+import { Badge, Button } from "@/components/ui/design-system";
+
+import { getCustomers, getSites } from "@/modules/assets/service";
 import type { Customer, Site } from "@/modules/assets/types";
 
 export default function SiteList() {
@@ -30,7 +27,7 @@ export default function SiteList() {
 
     return sites.filter((site) => {
       const customer = customers.find(
-        (item) => item.id === site.customerId
+        (item) => item.id === site.customerId,
       );
 
       const matchesSearch =
@@ -55,33 +52,36 @@ export default function SiteList() {
   }, [sites, customers, search, customerId, status]);
 
   return (
-    <div className="space-y-6">
+    <div className="sites-page">
       <PageHeader
         title="Sites"
         description="Manage customer sites and locations."
         action={
           <Link href="/sites/new">
-            <Button>Create Site</Button>
+            <Button size="sm">Create Site</Button>
           </Link>
         }
       />
 
-      <Panel
-        title="Filters"
-        description="Search and filter sites."
-      >
-        <div className="grid gap-4 md:grid-cols-3">
-        <SearchInput
-  value={search}
-  onChange={(event) => setSearch(event.target.value)}
-  placeholder="Search by site name, code, or address..."
-/>
+      <section className="sites-filter-card">
+        
+
+        <div className="sites-filter-fields">
+          <SearchInput
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            placeholder="Search by site name, code, or address..."
+            className="sites-search"
+          />
+
           <select
             value={customerId}
             onChange={(event) => setCustomerId(event.target.value)}
-            className="input"
+            className="sites-filter-select"
+            aria-label="Filter sites by customer"
           >
             <option value="">All Customers</option>
+
             {customers.map((customer) => (
               <option key={customer.id} value={customer.id}>
                 {customer.name}
@@ -92,79 +92,69 @@ export default function SiteList() {
           <select
             value={status}
             onChange={(event) => setStatus(event.target.value)}
-            className="input"
+            className="sites-filter-select"
+            aria-label="Filter sites by status"
           >
             <option value="">All Statuses</option>
             <option value="active">Active</option>
             <option value="inactive">Inactive</option>
           </select>
         </div>
-      </Panel>
+      </section>
 
-      <Panel
-        title="Sites"
-        description={`${filteredSites.length} site${
-          filteredSites.length === 1 ? "" : "s"
-        } found.`}
-      >
+      <section className="sites-table-card">
         {filteredSites.length === 0 ? (
-          <div className="py-8 text-center text-sm text-slate-500">
-            No sites match the current filters.
+          <div className="sites-empty-state">
+            <h3>No sites found</h3>
+            <p>No sites match the current filters.</p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
+          <div className="sites-table-wrapper">
+            <table className="sites-table">
               <thead>
-                <tr className="border-b border-slate-200">
-                  <th className="px-3 py-3 font-medium text-slate-600">
-                    Site
-                  </th>
-                  <th className="px-3 py-3 font-medium text-slate-600">
-                    Code
-                  </th>
-                  <th className="px-3 py-3 font-medium text-slate-600">
-                    Customer
-                  </th>
-                  <th className="px-3 py-3 font-medium text-slate-600">
-                    Address
-                  </th>
-                  <th className="px-3 py-3 font-medium text-slate-600">
-                    Status
-                  </th>
-                  <th className="px-3 py-3 font-medium text-slate-600">
-                    Actions
-                  </th>
+                <tr>
+                  <th>SITE</th>
+                  <th>CODE</th>
+                  <th>CUSTOMER</th>
+                  <th>ADDRESS</th>
+                  <th>STATUS</th>
+                  <th>ACTIONS</th>
                 </tr>
               </thead>
 
               <tbody>
                 {filteredSites.map((site) => {
                   const customer = customers.find(
-                    (item) => item.id === site.customerId
+                    (item) => item.id === site.customerId,
                   );
 
                   return (
-                    <tr
-                      key={site.id}
-                      className="border-b border-slate-100"
-                    >
-                      <td className="px-3 py-3 font-medium text-slate-900">
-                        {site.name}
+                    <tr key={site.id}>
+                      <td>
+                        <span className="sites-name">
+                          {site.name}
+                        </span>
                       </td>
 
-                      <td className="px-3 py-3 text-slate-600">
-                        {site.code}
+                      <td>
+                        <span className="sites-code">
+                          {site.code}
+                        </span>
                       </td>
 
-                      <td className="px-3 py-3 text-slate-600">
-                        {customer?.name || "—"}
+                      <td>
+                        <span className="sites-customer">
+                          {customer?.name || "—"}
+                        </span>
                       </td>
 
-                      <td className="px-3 py-3 text-slate-600">
-                        {site.address}
+                      <td>
+                        <span className="sites-address">
+                          {site.address || "—"}
+                        </span>
                       </td>
 
-                      <td className="px-3 py-3">
+                      <td>
                         <Badge
                           tone={
                             site.status === "active"
@@ -172,24 +162,56 @@ export default function SiteList() {
                               : "neutral"
                           }
                         >
-                          {site.status}
+                          {site.status === "active"
+                            ? "Active"
+                            : "Inactive"}
                         </Badge>
                       </td>
 
-                      <td className="px-3 py-3">
-                        <div className="flex gap-3">
+                      <td>
+                        <div className="site-row-actions">
                           <Link
                             href={`/sites/${site.id}`}
-                            className="text-sm font-medium text-blue-600 hover:underline"
+                            className="site-icon-button"
+                            aria-label={`View ${site.name}`}
+                            title="View site"
                           >
-                            View
+                            <svg
+                              width="18"
+                              height="18"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              aria-hidden="true"
+                            >
+                              <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z" />
+                              <circle cx="12" cy="12" r="2.5" />
+                            </svg>
                           </Link>
 
                           <Link
                             href={`/sites/${site.id}/edit`}
-                            className="text-sm font-medium text-blue-600 hover:underline"
+                            className="site-icon-button"
+                            aria-label={`Edit ${site.name}`}
+                            title="Edit site"
                           >
-                            Edit
+                            <svg
+                              width="18"
+                              height="18"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              aria-hidden="true"
+                            >
+                           
+                              <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z" />
+                            </svg>
                           </Link>
                         </div>
                       </td>
@@ -200,8 +222,7 @@ export default function SiteList() {
             </table>
           </div>
         )}
-      </Panel>
+      </section>
     </div>
   );
 }
-

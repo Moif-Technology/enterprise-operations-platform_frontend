@@ -1,9 +1,11 @@
+import type { ReactNode } from "react";
 
 interface PageHeaderProps {
   eyebrow?: string;
   title: string;
   description?: string;
-  action?: React.ReactNode;
+  action?: ReactNode;
+  secondaryAction?: ReactNode;
 }
 
 export default function PageHeader({
@@ -11,6 +13,7 @@ export default function PageHeader({
   title,
   description,
   action,
+  secondaryAction,
 }: PageHeaderProps) {
   return (
     <header className="page-header">
@@ -19,13 +22,19 @@ export default function PageHeader({
 
         <h1>{title}</h1>
 
-        {description && (
-          <p className="page-header-description">{description}</p>
-        )}
-      </div>
+        <div className="page-header-bottom">
+          {description && (
+            <p className="page-header-description">{description}</p>
+          )}
 
-      {action && <div className="page-header-action">{action}</div>}
+          {(action || secondaryAction) && (
+            <div className="page-header-actions">
+              {action}
+              {secondaryAction}
+            </div>
+          )}
+        </div>
+      </div>
     </header>
   );
 }
-

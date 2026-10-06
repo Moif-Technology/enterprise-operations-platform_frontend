@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import PageHeader from "@/components/ui/PageHeader";
 import { Badge, Button, Panel } from "@/components/ui/design-system";
+
 import {
   getAssetById,
   getCustomers,
@@ -22,13 +23,12 @@ export default async function AssetDetailPage({
   params,
 }: AssetDetailPageProps) {
   const { assetId } = await params;
-
   const asset = getAssetById(assetId);
 
   if (!asset) {
     return (
-      <main className="w-full max-w-full">
-        <div className="w-full max-w-full">
+      <main className="w-full">
+        <div className="w-full space-y-6 p-6">
           <PageHeader
             title="Asset not found"
             description="The requested asset could not be found."
@@ -64,269 +64,314 @@ export default async function AssetDetailPage({
   const workOrders = getMockWorkOrdersByAssetId(asset.id);
 
   return (
-    <main className="w-full max-w-full">
-      <div className="w-full max-w-full space-y-6">
-        <PageHeader
-          title={asset.name}
-          description={`${asset.assetCode} · ${asset.category}`}
-          action={
-            <div className="flex gap-3">
-              <Link href="/assets">
-                <Button variant="secondary">Back to Assets</Button>
-              </Link>
+    <main className="w-full">
+      <div className="w-full space-y-6 p-6">
+        {/* Header */}
+        <div className="asset-detail-header">
+          <div className="asset-detail-header-main">
+      
 
-              <Link href={`/assets/${asset.id}/edit`}>
-                <Button>Edit Asset</Button>
-              </Link>
-            </div>
-          }
-        />
+            <div className="asset-detail-title-row">
+              <h1>{asset.name}</h1>
 
-        <Panel title="Asset overview">
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            <div>
-              <p className="text-xs font-medium uppercase tracking-wide text-[#7a8494]">
-                Asset code
-              </p>
-              <p className="mt-1 text-sm font-semibold text-[#162033]">
+              <Badge
+                tone={
+                  asset.status === "active"
+                    ? "success"
+                    : asset.status === "under-maintenance"
+                      ? "warning"
+                      : asset.status === "decommissioned"
+                        ? "danger"
+                        : "neutral"
+                }
+              >
+                {asset.status}
+              </Badge>
+
+              <span className="asset-detail-code">
                 {asset.assetCode}
-              </p>
+              </span>
             </div>
 
-            <div>
-              <p className="text-xs font-medium uppercase tracking-wide text-[#7a8494]">
-                Category
-              </p>
-              <p className="mt-1 text-sm font-semibold text-[#162033]">
-                {asset.category}
-              </p>
-            </div>
-
-            <div>
-              <p className="text-xs font-medium uppercase tracking-wide text-[#7a8494]">
-                Status
-              </p>
-              <div className="mt-1">
-                <Badge>{asset.status}</Badge>
-              </div>
-            </div>
-
-            <div>
-              <p className="text-xs font-medium uppercase tracking-wide text-[#7a8494]">
-                Location
-              </p>
-              <p className="mt-1 text-sm font-semibold text-[#162033]">
-                {asset.location}
-              </p>
+            <div className="asset-detail-meta">
+              <span>
+                Customer: {customer?.name ?? "Unknown customer"}
+              </span>
+              <span>|</span>
+              <span>
+                Site: {site?.name ?? "Unknown site"}
+              </span>
+              <span>|</span>
+              <span>Category: {asset.category}</span>
             </div>
           </div>
-        </Panel>
 
-        <div className="grid gap-6 lg:grid-cols-2">
-          <Panel title="Customer and site">
-            <div className="space-y-4">
-              <div>
-                <p className="text-xs font-medium uppercase tracking-wide text-[#7a8494]">
-                  Customer
-                </p>
-                <p className="mt-1 text-sm font-semibold text-[#162033]">
-                  {customer?.name ?? "Unknown customer"}
-                </p>
-              </div>
+          <div className="asset-detail-header-actions">
+  <Link href="/assets">
+    <Button variant="secondary" type="button">
+      Cancel
+    </Button>
+  </Link>
 
-              <div>
-                <p className="text-xs font-medium uppercase tracking-wide text-[#7a8494]">
-                  Site
-                </p>
-                <p className="mt-1 text-sm font-semibold text-[#162033]">
-                  {site?.name ?? "Unknown site"}
-                </p>
-              </div>
-
-              <div>
-                <p className="text-xs font-medium uppercase tracking-wide text-[#7a8494]">
-                  Address
-                </p>
-                <p className="mt-1 text-sm text-[#5d6675]">
-                  {site?.address ?? "No address available"}
-                </p>
-              </div>
-            </div>
-          </Panel>
-
-          <Panel title="Registration details">
-            <div className="space-y-4">
-              <div>
-                <p className="text-xs font-medium uppercase tracking-wide text-[#7a8494]">
-                  Serial number
-                </p>
-                <p className="mt-1 text-sm text-[#162033]">
-                  {asset.serialNumber || "Not provided"}
-                </p>
-              </div>
-
-              <div>
-                <p className="text-xs font-medium uppercase tracking-wide text-[#7a8494]">
-                  Model
-                </p>
-                <p className="mt-1 text-sm text-[#162033]">
-                  {asset.model || "Not provided"}
-                </p>
-              </div>
-
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div>
-                  <p className="text-xs font-medium uppercase tracking-wide text-[#7a8494]">
-                    Installation
-                  </p>
-                  <p className="mt-1 text-sm text-[#162033]">
-                    {asset.installationDate}
-                  </p>
-                </div>
-
-                <div>
-                  <p className="text-xs font-medium uppercase tracking-wide text-[#7a8494]">
-                    Warranty expiry
-                  </p>
-                  <p className="mt-1 text-sm text-[#162033]">
-                    {asset.warrantyExpiry}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </Panel>
+  <Link href={`/assets/${asset.id}/edit`}>
+    <Button>
+      <span aria-hidden="true">✎</span>
+      Edit Asset
+    </Button>
+  </Link>
+</div>
         </div>
 
-        <Panel title="Maintenance plans">
-          {plans.length === 0 ? (
-            <p className="text-sm text-[#5d6675]">
-              No maintenance plans are configured for this asset.
-            </p>
-          ) : (
-            <div className="space-y-3">
-              {plans.map((plan) => (
-                <div
-                  key={plan.id}
-                  className="rounded-xl border border-[#dfe4ea] bg-white p-4"
-                >
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <h3 className="text-sm font-semibold text-[#162033]">
-                        {plan.planName}
-                      </h3>
-                      <p className="mt-1 text-xs text-[#5d6675]">
-                        {plan.frequency} · Next due {plan.nextDueDate}
-                      </p>
-                    </div>
-
-                    <Badge>{plan.status}</Badge>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </Panel>
-
-        <Panel title="Service history">
-          {history.length === 0 ? (
-            <p className="text-sm text-[#5d6675]">
-              No service history is available.
-            </p>
-          ) : (
-            <div className="space-y-3">
-              {history.map((entry) => (
-                <div
-                  key={entry.id}
-                  className="rounded-xl border border-[#dfe4ea] bg-white p-4"
-                >
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <h3 className="text-sm font-semibold text-[#162033]">
-                        {entry.summary}
-                      </h3>
-                      <p className="mt-1 text-xs text-[#5d6675]">
-                        {entry.performedOn} · {entry.performedBy}
-                      </p>
-                    </div>
-
-                    <Badge>{entry.outcome}</Badge>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </Panel>
-
-        <div className="grid gap-6 lg:grid-cols-2">
-          <Panel title="Documents">
-            {documents.length === 0 ? (
-              <p className="text-sm text-[#5d6675]">
-                No documents are available.
-              </p>
-            ) : (
-              <div className="space-y-3">
-                {documents.map((document) => (
-                  <div
-                    key={document.id}
-                    className="flex items-center justify-between rounded-xl border border-[#dfe4ea] bg-white p-4"
-                  >
-                    <div>
-                      <p className="text-sm font-semibold text-[#162033]">
-                        {document.name}
-                      </p>
-                      <p className="mt-1 text-xs text-[#5d6675]">
-                        {document.type} · {document.uploadedOn}
-                      </p>
-                    </div>
-
-                    <span className="text-xs text-[#7a8494]">
-                      Placeholder
-                    </span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </Panel>
-
-          <Panel title="Work order handoff">
-            {workOrders.length === 0 ? (
-              <p className="text-sm text-[#5d6675]">
-                No mock work orders are linked to this asset.
-              </p>
-            ) : (
-              <div className="space-y-3">
-                {workOrders.map((workOrder) => (
-                  <div
-                    key={workOrder.id}
-                    className="rounded-xl border border-[#dfe4ea] bg-white p-4"
-                  >
-                    <div className="flex items-start justify-between gap-4">
+        {/* Dashboard */}
+        <div className="asset-detail-dashboard">
+          {/* Main column */}
+          <div className="asset-detail-main-column">
+            {/* Maintenance Plans */}
+            <Panel title="Maintenance & Work Orders">
+              {plans.length === 0 ? (
+                <p className="text-sm text-[#5d6675]">
+                  No maintenance plans are configured for this asset.
+                </p>
+              ) : (
+                <div className="asset-detail-list">
+                  {plans.map((plan) => (
+                    <div
+                      key={plan.id}
+                      className="asset-detail-list-item"
+                    >
                       <div>
-                        <p className="text-xs font-medium uppercase tracking-wide text-[#7a8494]">
-                          {workOrder.reference}
+                        <h3>{plan.planName}</h3>
+                        <p>
+                          {plan.frequency} · Next due{" "}
+                          {plan.nextDueDate}
                         </p>
-                        <h3 className="mt-1 text-sm font-semibold text-[#162033]">
-                          {workOrder.title}
-                        </h3>
-                        <p className="mt-1 text-xs text-[#5d6675]">
+                      </div>
+
+                      <Badge
+                        tone={
+                          plan.status === "active"
+                            ? "success"
+                            : "neutral"
+                        }
+                      >
+                        {plan.status}
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </Panel>
+
+            {/* Service History */}
+            <Panel title="Service History">
+              {history.length === 0 ? (
+                <p className="text-sm text-[#5d6675]">
+                  No service history is available.
+                </p>
+              ) : (
+                <div className="asset-detail-table-wrapper">
+                  <table className="asset-detail-table">
+                    <thead>
+                      <tr>
+                        <th>Date</th>
+                        <th>Description</th>
+                        <th>Technician</th>
+                        <th>Status</th>
+                      </tr>
+                    </thead>
+
+                    <tbody>
+                      {history.map((entry) => (
+                        <tr key={entry.id}>
+                          <td>{entry.performedOn}</td>
+                          <td>{entry.summary}</td>
+                          <td>{entry.performedBy}</td>
+                          <td>
+                            <Badge
+                              tone={
+                                entry.outcome === "completed"
+                                  ? "success"
+                                  : entry.outcome === "partial"
+                                    ? "warning"
+                                    : "neutral"
+                              }
+                            >
+                              {entry.outcome}
+                            </Badge>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </Panel>
+
+            {/* Work Orders */}
+            <Panel title="Work Order Handoff">
+              {workOrders.length === 0 ? (
+                <p className="text-sm text-[#5d6675]">
+                  No work orders are linked to this asset.
+                </p>
+              ) : (
+                <div className="asset-detail-list">
+                  {workOrders.map((workOrder) => (
+                    <div
+                      key={workOrder.id}
+                      className="asset-detail-list-item"
+                    >
+                      <div>
+                        <span className="asset-detail-reference">
+                          {workOrder.reference}
+                        </span>
+
+                        <h3>{workOrder.title}</h3>
+
+                        <p>
                           Scheduled {workOrder.scheduledDate}
                         </p>
                       </div>
 
-                      <Badge>{workOrder.status}</Badge>
+                      <Badge
+                        tone={
+                          workOrder.status === "completed"
+                            ? "success"
+                            : workOrder.status === "cancelled"
+                              ? "danger"
+                              : workOrder.status === "in-progress"
+                                ? "info"
+                                : "neutral"
+                        }
+                      >
+                        {workOrder.status}
+                      </Badge>
                     </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </Panel>
-        </div>
+                  ))}
+                </div>
+              )}
+            </Panel>
 
-        {asset.notes && (
-          <Panel title="Notes">
-            <p className="text-sm leading-6 text-[#5d6675]">{asset.notes}</p>
-          </Panel>
-        )}
+            {/* Documents */}
+            <Panel title="Documents & Attachments">
+              {documents.length === 0 ? (
+                <p className="text-sm text-[#5d6675]">
+                  No documents are available.
+                </p>
+              ) : (
+                <div className="asset-detail-documents">
+                  {documents.map((document) => (
+                    <div
+                      key={document.id}
+                      className="asset-detail-document"
+                    >
+                      <div className="asset-detail-document-icon">
+                        📄
+                      </div>
+
+                      <div className="asset-detail-document-info">
+                        <p>{document.name}</p>
+                        <span>
+                          {document.type} · {document.uploadedOn}
+                        </span>
+                      </div>
+
+                      <span className="asset-detail-document-action">
+                        Download
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </Panel>
+
+            {/* Notes */}
+            {asset.notes && (
+              <Panel title="Notes">
+                <div className="asset-detail-notes">
+                  {asset.notes}
+                </div>
+              </Panel>
+            )}
+          </div>
+
+          {/* Right sidebar */}
+          <aside className="asset-detail-sidebar">
+            {/* Asset Overview */}
+            <Panel title="Quick Details">
+              <div className="asset-detail-key-value-grid">
+                <div>
+                  <span>Asset Code</span>
+                  <strong>{asset.assetCode}</strong>
+                </div>
+
+                <div>
+                  <span>Category</span>
+                  <strong>{asset.category}</strong>
+                </div>
+
+                <div>
+                  <span>Location</span>
+                  <strong>{asset.location}</strong>
+                </div>
+
+                <div>
+                  <span>Installation Date</span>
+                  <strong>{asset.installationDate}</strong>
+                </div>
+              </div>
+            </Panel>
+
+            {/* Customer & Site */}
+            <Panel title="Customer & Site">
+              <div className="asset-detail-key-value-stack">
+                <div>
+                  <span>Customer</span>
+                  <strong>
+                    {customer?.name ?? "Unknown customer"}
+                  </strong>
+                </div>
+
+                <div>
+                  <span>Site</span>
+                  <strong>
+                    {site?.name ?? "Unknown site"}
+                  </strong>
+                </div>
+
+                <div>
+                  <span>Address</span>
+                  <strong>
+                    {site?.address ?? "No address available"}
+                  </strong>
+                </div>
+              </div>
+            </Panel>
+
+            {/* Registration */}
+            <Panel title="Serial & Warranty">
+              <div className="asset-detail-key-value-stack">
+                <div>
+                  <span>Serial Number</span>
+                  <strong>
+                    {asset.serialNumber || "Not provided"}
+                  </strong>
+                </div>
+
+                <div>
+                  <span>Model</span>
+                  <strong>
+                    {asset.model || "Not provided"}
+                  </strong>
+                </div>
+
+                <div>
+                  <span>Warranty Expiry</span>
+                  <strong>{asset.warrantyExpiry}</strong>
+                </div>
+              </div>
+            </Panel>
+          </aside>
+        </div>
       </div>
     </main>
   );
