@@ -65,6 +65,7 @@ export default function SparePartList() {
           ? error.message
           : "The spare parts list could not be loaded.",
       );
+
     }
   };
 
@@ -146,7 +147,7 @@ export default function SparePartList() {
       <PageHeader
         eyebrow="Inventory"
         title="Spare parts"
-        description="Search and filter spare parts by code, category, status, and stock level."
+        description="Manage the spare part item master and monitor current stock levels."
         action={
           <Button onClick={() => router.push("/inventory/spare-parts/new")}>
             Add Spare Part

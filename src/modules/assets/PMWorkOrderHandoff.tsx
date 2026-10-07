@@ -1,10 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 
-import { Badge, Button, Panel } from "@/components/ui/design-system";
+import { Badge } from "@/components/ui/design-system";
 import {
-  completeMockWorkOrder,
   getMockWorkOrdersByPlanId,
 } from "@/modules/assets/service";
 import type { MaintenancePlan } from "@/modules/assets/types";
@@ -16,100 +15,73 @@ type PMWorkOrderHandoffProps = {
 export default function PMWorkOrderHandoff({
   plan,
 }: PMWorkOrderHandoffProps) {
-  const [handedOff, setHandedOff] = useState(false);
-  const [completed, setCompleted] = useState(false);
-
-
   const workOrder = useMemo(
     () => getMockWorkOrdersByPlanId(plan.id)[0],
     [plan.id],
   );
 
-  if (!workOrder) {
-    return (
-      <Panel
-        title="PM Work Order Handoff"
-        description="Create a mock work-order handoff from this maintenance plan."
-      >
-        <p className="text-sm text-slate-500">
-          No mock work order is linked to this maintenance plan yet.
-        </p>
-      </Panel>
-    );
-  }
-
   return (
-    <Panel
-      title="PM Work Order Handoff"
-      description="Mock handoff from preventive maintenance to the work-order workflow."
-    >
-      <div className="space-y-4">
-        <div className="grid gap-4 md:grid-cols-3">
-          <div>
-            <p className="text-xs font-medium text-slate-500">
-              Work Order
-            </p>
-            <p className="mt-1 text-sm font-semibold text-slate-900">
-              {workOrder.reference}
-            </p>
-          </div>
-
-          <div>
-            <p className="text-xs font-medium text-slate-500">
-              Scheduled Date
-            </p>
-            <p className="mt-1 text-sm font-semibold text-slate-900">
-              {workOrder.scheduledDate}
-            </p>
-          </div>
-
-          <div>
-            <p className="text-xs font-medium text-slate-500">Status</p>
-            <div className="mt-1">
-              <Badge tone="neutral">{workOrder.status}</Badge>
-            </div>
-          </div>
-        </div>
-
-        <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
-          <p className="text-sm font-medium text-slate-900">
-            {workOrder.title}
-          </p>
-
-          {workOrder.notes && (
-            <p className="mt-1 text-sm text-slate-500">
-              {workOrder.notes}
-            </p>
-          )}
-        </div>
-
-        {handedOff && (
-          <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">
-            PM work order completed successfully. Service history and next due date updated.
-          </div>
-        )}
-
-        {workOrder.status !== "completed" && (
-          <div className="flex justify-end">
-            <Button
-              type="button"
-              onClick={() => {
-                setHandedOff(true);
-              
-                if (workOrder.status !== "completed") {
-                  completeMockWorkOrder(
-                    workOrder.id,
-                    new Date().toISOString().slice(0, 10),
-                  );
-                  setCompleted(true);
-                }
-              }}
-            >
-              {handedOff ? "Handoff Complete" : "Hand Off to Work Order"}
-            </Button>
-          </div>
-        )}
+    <section className="maintenance-plan-detail-card">
+      <div className="maintenance-plan-detail-card-header">
+        <h2>PM Work Order Handoff</h2>
+        <p className="maintenance-plan-handoff-description">
+          Recent work orders generated from this preventive maintenance
+          schedule.
+        </p>
       </div>
-    </Panel>
+
+      {!workOrder ? (
+        <p className="maintenance-plan-detail-empty">
+          No work order has been generated from this maintenance plan yet.
+        </p>
+      ) : (
+        <div className="maintenance-plan-work-order-table-wrapper">
+          <table className="maintenance-plan-work-order-table">
+            <thead>
+              <tr>
+                <th>WO Number</th>
+                <th>Scheduled Date</th>
+                <th>Status</th>
+                <th>Notes</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr>
+                <td>
+                  <span className="maintenance-plan-work-order-number">
+                    {workOrder.reference}
+                  </span>
+                </td>
+
+                <td>
+                  <span className="maintenance-plan-work-order-date">
+                    {workOrder.scheduledDate}
+                  </span>
+                </td>
+
+                <td>
+                  <Badge
+                    tone={
+                      workOrder.status === "completed"
+                        ? "info"
+                        : "neutral"
+                    }
+                  >
+                    {workOrder.status}
+                  </Badge>
+                </td>
+
+                <td>
+                  <span className="maintenance-plan-work-order-notes">
+                    {workOrder.notes || workOrder.title}
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      )}
+    </section>
   );
 }

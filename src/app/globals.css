@@ -2834,3 +2834,1976 @@ button {
     width: 100%;
   }
 }
+.contracts-page {
+  width: 100%;
+}
+
+.contracts-filter-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+  margin: 24px 0;
+  padding: 20px;
+}
+
+.contracts-filter-heading {
+  margin-bottom: 12px;
+}
+
+.contracts-filter-heading h2 {
+  color: #0f172a;
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.contracts-filter-heading p {
+  color: #64748b;
+  font-size: 12px;
+  margin: 3px 0 0;
+}
+
+.contracts-filter-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.contracts-search {
+  width: 100%;
+}
+
+.contracts-filter-select {
+  background: #fff;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  color: #1e293b;
+  font-family: inherit;
+  font-size: 14px;
+  min-height: 40px;
+  outline: none;
+  padding: 8px 12px;
+  width: 100%;
+}
+
+.contracts-filter-select:focus {
+  border-color: #10b981;
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.15);
+}
+
+.contracts-filter-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 12px;
+}
+
+/* Table */
+
+.contracts-table-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+  overflow: hidden;
+}
+
+.contracts-table-wrapper {
+  overflow-x: auto;
+}
+
+.contracts-table {
+  border-collapse: collapse;
+  min-width: 1100px;
+  text-align: left;
+  width: 100%;
+}
+
+.contracts-table thead {
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.contracts-table th {
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  padding: 12px 24px;
+  text-align: left;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.contracts-table tbody {
+  background: #fff;
+}
+
+.contracts-table tbody tr {
+  border-bottom: 1px solid #e2e8f0;
+  transition: background-color 0.15s ease;
+}
+
+.contracts-table tbody tr:hover {
+  background: #f8fafc;
+}
+
+.contracts-table tbody tr:last-child {
+  border-bottom: 0;
+}
+
+.contracts-table td {
+  color: #334155;
+  font-size: 14px;
+  padding: 16px 24px;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+/* Columns */
+
+.contracts-number {
+  background: #f1f5f9;
+  border-radius: 4px;
+  color: #475569;
+  display: inline-block;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 8px;
+  width: fit-content;
+}
+
+.contracts-title {
+  color: #0f172a;
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  max-width: 320px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.contracts-customer {
+  color: #475569;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.contracts-type {
+  color: #475569;
+  font-size: 14px;
+}
+
+.contracts-date {
+  color: #64748b;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 13px;
+}
+
+/* Actions */
+
+.contract-row-actions {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+}
+
+.contract-icon-button {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  color: #94a3b8;
+  display: inline-flex;
+  height: 32px;
+  justify-content: center;
+  padding: 6px;
+  text-decoration: none;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+  width: 32px;
+}
+
+.contract-icon-button:hover {
+  background: #f8fafc;
+  color: #475569;
+}
+
+.contract-icon-button:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Responsive */
+
+@media (max-width: 900px) {
+  .contracts-filter-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .contracts-filter-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .contracts-filter-card {
+    padding: 16px;
+  }
+
+  .contracts-table th,
+  .contracts-table td {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+}
+/* Contract Form */
+.contract-form-page {
+  width: 100%;
+}
+
+.contract-form-header-actions {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+}
+
+.contract-form {
+  margin-top: 24px;
+}
+
+.contract-form-grid {
+  display: grid;
+  gap: 24px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.contract-form-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+  min-width: 0;
+  padding: 24px;
+}
+
+.contract-form-card-wide {
+  grid-column: span 2;
+}
+
+.contract-form-card-header {
+  border-bottom: 1px solid #e2e8f0;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+}
+
+.contract-form-card-header h3 {
+  color: #0f172a;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.contract-form-fields {
+  display: grid;
+  gap: 18px 16px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.contract-form-commercial-grid {
+  display: grid;
+  gap: 18px 16px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.contract-form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.contract-form-field > span:first-child {
+  color: #475569;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.contract-form-required {
+  color: #dc2626;
+}
+
+.contract-form-field input,
+.contract-form-field select,
+.contract-form-field textarea,
+.contract-form-multi-select-trigger {
+  background: #fff;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  box-sizing: border-box;
+  color: #1e293b;
+  font-family: inherit;
+  font-size: 14px;
+  min-height: 42px;
+  outline: none;
+  padding: 9px 12px;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+  width: 100%;
+}
+
+.contract-form-field textarea {
+  min-height: auto;
+  resize: vertical;
+}
+
+.contract-form-field input:focus,
+.contract-form-field select:focus,
+.contract-form-field textarea:focus,
+.contract-form-multi-select-trigger:focus-visible {
+  border-color: #10b981;
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.15);
+}
+
+.contract-form-field input::placeholder,
+.contract-form-field textarea::placeholder {
+  color: #94a3b8;
+}
+
+.contract-form-field-full {
+  grid-column: 1 / -1;
+}
+
+.contract-form-control-error {
+  background: rgba(254, 242, 242, 0.2) !important;
+  border-color: #ef4444 !important;
+}
+
+.contract-form-control-error:focus {
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.15) !important;
+}
+
+.contract-form-field-error {
+  color: #dc2626;
+  display: block;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.contract-form-error {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 6px;
+  color: #b91c1c;
+  font-size: 14px;
+  line-height: 1.5;
+  margin-top: 16px;
+  padding: 12px 14px;
+}
+
+.contract-form-multi-select {
+  position: relative;
+}
+
+.contract-form-multi-select-trigger {
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  text-align: left;
+}
+
+.contract-form-multi-select-trigger:disabled {
+  background: #f8fafc;
+  color: #94a3b8;
+  cursor: not-allowed;
+}
+
+.contract-form-multi-select-menu {
+  background: #fff;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.1);
+  left: 0;
+  max-height: 240px;
+  overflow-y: auto;
+  padding: 6px;
+  position: absolute;
+  right: 0;
+  top: calc(100% + 4px);
+  z-index: 20;
+}
+
+.contract-form-option {
+  align-items: center;
+  border-radius: 4px;
+  color: #334155;
+  cursor: pointer;
+  display: flex;
+  font-size: 14px;
+  gap: 8px;
+  padding: 9px 8px;
+}
+
+.contract-form-option:hover {
+  background: #f8fafc;
+}
+
+.contract-form-option input {
+  accent-color: var(--primary);
+  min-height: auto;
+  width: auto;
+}
+
+.contract-form-option-empty {
+  color: #64748b;
+  font-size: 13px;
+  margin: 0;
+  padding: 10px 8px;
+}
+
+.contract-form-help {
+  color: #64748b;
+  font-size: 12px;
+  line-height: 1.4;
+  margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .contract-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .contract-form-card-wide {
+    grid-column: auto;
+  }
+
+  .contract-form-commercial-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .contract-form-card {
+    padding: 20px;
+  }
+
+  .contract-form-fields,
+  .contract-form-commercial-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .contract-form-field-full {
+    grid-column: auto;
+  }
+
+  .contract-form-header-actions {
+    width: 100%;
+  }
+
+  .contract-form-header-actions .btn {
+    flex: 1;
+  }
+}
+/* Contract Detail */
+.contract-detail-page {
+  width: 100%;
+}
+
+.contract-detail-header {
+  align-items: flex-end;
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.contract-detail-header-content {
+  min-width: 0;
+}
+
+.contract-detail-title-row {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.contract-detail-title-row h1 {
+  color: var(--ink);
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.contract-detail-code {
+  background: #f1f5f9;
+  border-radius: 4px;
+  color: #475569;
+  display: inline-flex;
+  font-family:
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    Monaco,
+    Consolas,
+    monospace;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 8px;
+}
+
+.contract-detail-subtitle {
+  color: #64748b;
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 8px 0 0;
+}
+
+.contract-detail-header-actions {
+  align-items: center;
+  display: flex;
+  flex-shrink: 0;
+  gap: 8px;
+}
+
+.contract-detail-header-actions .btn {
+  gap: 8px;
+}
+
+.contract-detail-pencil-icon {
+  align-items: center;
+  display: inline-flex;
+}
+
+.contract-detail-dashboard {
+  display: grid;
+  gap: 24px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.contract-detail-main-column {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  grid-column: span 2;
+  min-width: 0;
+}
+
+.contract-detail-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  grid-column: span 1;
+  min-width: 0;
+}
+
+.contract-detail-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+  min-width: 0;
+  padding: 24px;
+}
+
+.contract-detail-card-header {
+  border-bottom: 1px solid #e2e8f0;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+}
+
+.contract-detail-card-header h2 {
+  color: #0f172a;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.contract-detail-key-value-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.contract-detail-key-value-stack > div > span {
+  color: #64748b;
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.contract-detail-key-value-stack strong {
+  color: #0f172a;
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+  margin-top: 2px;
+  overflow-wrap: anywhere;
+}
+
+.contract-detail-value-link {
+  color: var(--primary);
+  display: inline-block;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+  margin-top: 2px;
+  text-decoration: none;
+}
+
+.contract-detail-value-link:hover {
+  text-decoration: underline;
+}
+
+.contract-detail-body-text {
+  color: #334155;
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 4px 0 0;
+  white-space: pre-wrap;
+}
+
+.contract-detail-table-wrapper {
+  overflow-x: auto;
+}
+
+.contract-detail-table {
+  border-collapse: collapse;
+  min-width: 680px;
+  text-align: left;
+  width: 100%;
+}
+
+.contract-detail-table thead {
+  background: #f8fafc;
+}
+
+.contract-detail-table th {
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  padding: 12px 16px;
+  text-align: left;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.contract-detail-table tbody tr {
+  border-top: 1px solid #e2e8f0;
+  transition: background-color 0.15s ease;
+}
+
+.contract-detail-table tbody tr:hover {
+  background: #f8fafc;
+}
+
+.contract-detail-table td {
+  color: #334155;
+  font-size: 14px;
+  padding: 14px 16px;
+  vertical-align: middle;
+}
+
+.contract-detail-asset-name {
+  color: #0f172a;
+  font-weight: 500;
+}
+
+.contract-detail-asset-code {
+  color: #475569;
+  font-family:
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    Monaco,
+    Consolas,
+    monospace;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.contract-detail-empty-cell {
+  color: #64748b !important;
+  padding: 24px 16px !important;
+  text-align: center;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .contract-detail-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .contract-detail-header-actions {
+    align-self: flex-end;
+  }
+
+  .contract-detail-dashboard {
+    grid-template-columns: 1fr;
+  }
+
+  .contract-detail-main-column,
+  .contract-detail-sidebar {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 640px) {
+  .contract-detail-title-row h1 {
+    font-size: 28px;
+  }
+
+  .contract-detail-card {
+    padding: 20px;
+  }
+
+  .contract-detail-header-actions {
+    align-self: stretch;
+    width: 100%;
+  }
+
+  .contract-detail-header-actions .btn {
+    flex: 1;
+  }
+}
+/* Maintenance Plans */
+.maintenance-plans-page {
+  width: 100%;
+}
+
+.maintenance-plans-create-link {
+  text-decoration: none;
+}
+
+.maintenance-plans-filter-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+  margin: 24px 0;
+  padding: 20px;
+}
+
+.maintenance-plans-filter-heading {
+  margin-bottom: 12px;
+}
+
+.maintenance-plans-filter-heading h2 {
+  color: #0f172a;
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.maintenance-plans-filter-heading p {
+  color: #64748b;
+  font-size: 12px;
+  margin: 3px 0 0;
+}
+
+.maintenance-plans-filter-fields {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.maintenance-plans-search {
+  flex: 1;
+  width: 100%;
+}
+
+.maintenance-plans-filter-select {
+  background: #fff;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  color: #1e293b;
+  font-family: inherit;
+  font-size: 14px;
+  min-height: 40px;
+  outline: none;
+  padding: 8px 12px;
+  width: 100%;
+}
+
+.maintenance-plans-filter-select:focus {
+  border-color: #10b981;
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.15);
+}
+
+.maintenance-plans-table-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+  overflow: hidden;
+}
+
+.maintenance-plans-table-wrapper {
+  overflow-x: auto;
+}
+
+.maintenance-plans-table {
+  border-collapse: collapse;
+  min-width: 950px;
+  text-align: left;
+  width: 100%;
+}
+
+.maintenance-plans-table thead {
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.maintenance-plans-table th {
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  padding: 12px 24px;
+  text-align: left;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.maintenance-plans-table tbody {
+  background: #fff;
+}
+
+.maintenance-plans-table tbody tr {
+  border-bottom: 1px solid #e2e8f0;
+  transition: background-color 0.15s ease;
+}
+
+.maintenance-plans-table tbody tr:hover {
+  background: #f8fafc;
+}
+
+.maintenance-plans-table tbody tr:last-child {
+  border-bottom: 0;
+}
+
+.maintenance-plans-table td {
+  color: #334155;
+  font-size: 14px;
+  padding: 16px 24px;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.maintenance-plan-name {
+  color: #0f172a;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.maintenance-plan-code {
+  background: #f1f5f9;
+  border-radius: 4px;
+  color: #64748b;
+  display: inline-block;
+  font-family:
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    Monaco,
+    Consolas,
+    monospace;
+  font-size: 12px;
+  margin-top: 2px;
+  padding: 2px 6px;
+  width: fit-content;
+}
+
+.maintenance-plan-asset-link {
+  display: flex;
+  flex-direction: column;
+  color: #1e293b;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.maintenance-plan-asset-link > span:first-child {
+  transition: color 0.15s ease;
+}
+
+.maintenance-plan-asset-link:hover > span:first-child {
+  color: #047857;
+}
+
+.maintenance-plan-asset-code {
+  color: #64748b;
+  font-family:
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    Monaco,
+    Consolas,
+    monospace;
+  font-size: 12px;
+  font-weight: 400;
+  margin-top: 2px;
+}
+
+.maintenance-plan-unavailable {
+  color: #64748b;
+}
+
+.maintenance-plan-frequency {
+  background: #f1f5f9;
+  border-radius: 6px;
+  color: #334155;
+  display: inline-flex;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 5px 10px;
+  text-transform: capitalize;
+}
+
+.maintenance-plan-date {
+  color: #475569;
+  font-family:
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    Monaco,
+    Consolas,
+    monospace;
+  font-size: 14px;
+}
+
+.maintenance-plan-status {
+  border-radius: 999px;
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 2px 10px;
+  text-transform: capitalize;
+}
+
+.maintenance-plan-status-active {
+  background: #ecfdf5;
+  border: 1px solid rgba(167, 243, 208, 0.6);
+  color: #047857;
+}
+
+.maintenance-plan-status-paused {
+  background: #fffbeb;
+  border: 1px solid rgba(253, 230, 138, 0.6);
+  color: #b45309;
+}
+
+.maintenance-plan-actions {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+}
+
+.maintenance-plan-icon-button {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  color: #94a3b8;
+  display: inline-flex;
+  height: 32px;
+  justify-content: center;
+  padding: 6px;
+  text-decoration: none;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+  width: 32px;
+}
+
+.maintenance-plan-icon-button:hover {
+  background: #f8fafc;
+  color: #475569;
+}
+
+.maintenance-plan-icon-button:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.maintenance-plans-empty-state {
+  padding: 48px 24px;
+  text-align: center;
+}
+
+.maintenance-plans-empty-state h3 {
+  color: #0f172a;
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.maintenance-plans-empty-state p {
+  color: #94a3b8;
+  font-size: 14px;
+  margin: 4px 0 0;
+}
+
+/* Responsive */
+@media (min-width: 640px) {
+  .maintenance-plans-filter-fields {
+    flex-direction: row;
+  }
+
+  .maintenance-plans-filter-select {
+    width: auto;
+  }
+}
+
+@media (max-width: 767px) {
+  .maintenance-plans-table th,
+  .maintenance-plans-table td {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+}
+
+@media (max-width: 640px) {
+  .maintenance-plans-filter-card {
+    padding: 16px;
+  }
+
+  .maintenance-plans-filter-select {
+    width: 100%;
+  }
+}
+/* Maintenance Plan Form */
+.maintenance-plan-form-page {
+  width: 100%;
+}
+
+.maintenance-plan-form-header-actions {
+  align-items: center;
+  display: flex;
+  flex-shrink: 0;
+  gap: 8px;
+}
+
+.maintenance-plan-form {
+  margin-top: 24px;
+}
+
+.maintenance-plan-form-grid {
+  display: grid;
+  gap: 24px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.maintenance-plan-form-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+  min-width: 0;
+  padding: 24px;
+}
+
+.maintenance-plan-form-card-header {
+  border-bottom: 1px solid #e2e8f0;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+}
+
+.maintenance-plan-form-card-header h3 {
+  color: #0f172a;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.maintenance-plan-form-card-header p {
+  color: #64748b;
+  font-size: 13px;
+  line-height: 1.5;
+  margin: 4px 0 0;
+}
+
+.maintenance-plan-form-fields {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.maintenance-plan-form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.maintenance-plan-form-field label {
+  color: #334155;
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.maintenance-plan-form-required {
+  color: #dc2626;
+}
+
+.maintenance-plan-form-field input,
+.maintenance-plan-form-field select,
+.maintenance-plan-form-field textarea {
+  background: #fff;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  color: #0f172a;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.5;
+  outline: none;
+  padding: 9px 12px;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+  width: 100%;
+}
+
+.maintenance-plan-form-field input::placeholder,
+.maintenance-plan-form-field textarea::placeholder {
+  color: #94a3b8;
+}
+
+.maintenance-plan-form-field input:focus,
+.maintenance-plan-form-field select:focus,
+.maintenance-plan-form-field textarea:focus {
+  border-color: #10b981;
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.15);
+}
+
+.maintenance-plan-form-field textarea {
+  min-height: 144px;
+  resize: vertical;
+}
+
+.maintenance-plan-form-field input:disabled,
+.maintenance-plan-form-field select:disabled,
+.maintenance-plan-form-field textarea:disabled {
+  background: #f8fafc;
+  cursor: not-allowed;
+  opacity: 0.75;
+}
+
+.maintenance-plan-form-field
+  input.maintenance-plan-form-control-error,
+.maintenance-plan-form-field
+  select.maintenance-plan-form-control-error,
+.maintenance-plan-form-field
+  textarea.maintenance-plan-form-control-error {
+  border-color: #ef4444;
+}
+
+.maintenance-plan-form-field
+  input.maintenance-plan-form-control-error:focus,
+.maintenance-plan-form-field
+  select.maintenance-plan-form-control-error:focus,
+.maintenance-plan-form-field
+  textarea.maintenance-plan-form-control-error:focus {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.15);
+}
+
+.maintenance-plan-form-field-error {
+  color: #dc2626;
+  font-size: 12px;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.maintenance-plan-form-success {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 6px;
+  color: #166534;
+  font-size: 14px;
+  margin-top: 16px;
+  padding: 12px 16px;
+}
+
+.maintenance-plan-form-error {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 6px;
+  color: #991b1b;
+  font-size: 14px;
+  margin-top: 16px;
+  padding: 12px 16px;
+}
+
+.maintenance-plan-selected-asset {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 24px;
+  padding: 20px 24px;
+}
+
+.maintenance-plan-selected-asset div {
+  min-width: 0;
+}
+
+.maintenance-plan-selected-asset span {
+  color: #64748b;
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.maintenance-plan-selected-asset strong {
+  color: #0f172a;
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  margin-top: 4px;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 900px) {
+  .maintenance-plan-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .maintenance-plan-form-header-actions {
+    align-self: flex-end;
+  }
+}
+
+@media (max-width: 640px) {
+  .maintenance-plan-form-fields {
+    grid-template-columns: 1fr;
+  }
+
+  .maintenance-plan-form-card {
+    padding: 20px;
+  }
+
+  .maintenance-plan-form-header-actions {
+    align-self: stretch;
+    width: 100%;
+  }
+
+  .maintenance-plan-form-header-actions .btn {
+    flex: 1;
+  }
+
+  .maintenance-plan-selected-asset {
+    grid-template-columns: 1fr;
+    padding: 20px;
+  }
+}
+/* Maintenance Plan Detail */
+.maintenance-plan-detail-page {
+  width: 100%;
+}
+
+.maintenance-plan-detail-header {
+  align-items: flex-end;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.maintenance-plan-detail-header-content {
+  min-width: 0;
+}
+
+.maintenance-plan-detail-title-row {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.maintenance-plan-detail-title-row h1 {
+  color: var(--ink);
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.maintenance-plan-detail-code {
+  background: #f1f5f9;
+  border-radius: 4px;
+  color: #475569;
+  display: inline-flex;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 8px;
+}
+
+.maintenance-plan-detail-subtitle {
+  color: #64748b;
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 8px 0 0;
+}
+
+.maintenance-plan-detail-header-actions {
+  align-items: center;
+  display: flex;
+  flex-shrink: 0;
+  gap: 8px;
+}
+
+.maintenance-plan-detail-header-actions .btn {
+  gap: 8px;
+}
+
+.maintenance-plan-detail-dashboard {
+  display: grid;
+  gap: 24px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.maintenance-plan-detail-main-column,
+.maintenance-plan-detail-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  min-width: 0;
+}
+
+.maintenance-plan-detail-main-column {
+  grid-column: span 2;
+}
+
+.maintenance-plan-detail-sidebar {
+  grid-column: span 1;
+}
+
+.maintenance-plan-detail-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+  min-width: 0;
+  padding: 24px;
+}
+
+.maintenance-plan-detail-card-header {
+  border-bottom: 1px solid #e2e8f0;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+}
+
+.maintenance-plan-detail-card-header h2 {
+  color: #0f172a;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Checklist */
+
+.maintenance-plan-checklist {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.maintenance-plan-checklist li {
+  align-items: center;
+  color: #1e293b;
+  display: flex;
+  font-size: 14px;
+  font-weight: 500;
+  gap: 10px;
+  line-height: 1.5;
+}
+
+.maintenance-plan-check-icon {
+  align-items: center;
+  background: #ecfdf5;
+  border-radius: 999px;
+  color: #059669;
+  display: inline-flex;
+  flex-shrink: 0;
+  font-size: 12px;
+  font-weight: 700;
+  height: 24px;
+  justify-content: center;
+  width: 24px;
+}
+
+.maintenance-plan-detail-empty {
+  color: #64748b;
+  font-size: 14px;
+  margin: 0;
+}
+
+/* Key / value sections */
+
+.maintenance-plan-detail-key-value-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.maintenance-plan-detail-key-value-stack span {
+  color: #64748b;
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.maintenance-plan-detail-key-value-stack strong {
+  color: #0f172a;
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+  margin-top: 2px;
+  overflow-wrap: anywhere;
+}
+
+.maintenance-plan-detail-value-badge {
+  margin-top: 4px;
+}
+
+.maintenance-plan-detail-due-date {
+  color: #d97706 !important;
+  font-weight: 600 !important;
+}
+
+.maintenance-plan-detail-value-link {
+  color: var(--primary);
+  display: inline-block;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+  margin-top: 2px;
+  text-decoration: none;
+}
+
+.maintenance-plan-detail-value-link:hover {
+  text-decoration: underline;
+}
+
+/* Responsive */
+
+@media (max-width: 900px) {
+  .maintenance-plan-detail-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .maintenance-plan-detail-header-actions {
+    align-self: flex-end;
+  }
+
+  .maintenance-plan-detail-dashboard {
+    grid-template-columns: 1fr;
+  }
+
+  .maintenance-plan-detail-main-column,
+  .maintenance-plan-detail-sidebar {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 640px) {
+  .maintenance-plan-detail-title-row h1 {
+    font-size: 28px;
+  }
+
+  .maintenance-plan-detail-card {
+    padding: 20px;
+  }
+
+  .maintenance-plan-detail-header-actions {
+    align-self: stretch;
+  }
+
+  .maintenance-plan-detail-header-actions .btn {
+    flex: 1;
+  }
+}
+/* Maintenance Plan Detail - PM Work Order Handoff */
+
+.maintenance-plan-handoff-description {
+  color: #64748b;
+  font-size: 12px;
+  line-height: 1.5;
+  margin: 4px 0 0;
+}
+
+.maintenance-plan-work-order-table-wrapper {
+  overflow-x: auto;
+  width: 100%;
+}
+
+.maintenance-plan-work-order-table {
+  border-collapse: collapse;
+  min-width: 720px;
+  text-align: left;
+  width: 100%;
+}
+
+.maintenance-plan-work-order-table thead {
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.maintenance-plan-work-order-table th {
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  padding: 11px 14px;
+  text-align: left;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.maintenance-plan-work-order-table tbody tr {
+  border-bottom: 1px solid #e2e8f0;
+  transition: background-color 0.15s ease;
+}
+
+.maintenance-plan-work-order-table tbody tr:hover {
+  background: #f8fafc;
+}
+
+.maintenance-plan-work-order-table tbody tr:last-child {
+  border-bottom: 0;
+}
+
+.maintenance-plan-work-order-table td {
+  color: #334155;
+  font-size: 14px;
+  padding: 15px 14px;
+  vertical-align: middle;
+}
+
+.maintenance-plan-work-order-number {
+  background: #f1f5f9;
+  border-radius: 4px;
+  color: #475569;
+  display: inline-flex;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 8px;
+}
+
+.maintenance-plan-work-order-date {
+  color: #64748b;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 13px;
+}
+
+.maintenance-plan-work-order-notes {
+  color: #475569;
+  display: block;
+  line-height: 1.5;
+  max-width: 360px;
+}
+
+@media (max-width: 640px) {
+  .maintenance-plan-detail-card {
+    padding: 20px;
+  }
+
+  .maintenance-plan-work-order-table th,
+  .maintenance-plan-work-order-table td {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+}
+/* Upcoming Maintenance */
+
+.upcoming-maintenance-page {
+  width: 100%;
+}
+
+.upcoming-maintenance-stats {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 24px 0;
+}
+
+.upcoming-maintenance-stat-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 126px;
+  padding: 16px;
+}
+
+.upcoming-maintenance-stat-label {
+  color: #475569;
+  font-size: 13px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.upcoming-maintenance-stat-value {
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1;
+  margin: 10px 0 0;
+}
+
+.upcoming-maintenance-stat-overdue {
+  color: #dc2626;
+}
+
+.upcoming-maintenance-stat-due {
+  color: #d97706;
+}
+
+.upcoming-maintenance-stat-upcoming {
+  color: #047857;
+}
+
+.upcoming-maintenance-stat-subtext {
+  color: #64748b;
+  font-size: 12px;
+  margin: 12px 0 0;
+}
+
+/* Filters */
+
+.upcoming-maintenance-filters {
+  align-items: center;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  padding: 20px;
+}
+
+.upcoming-maintenance-search {
+  align-items: center;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  color: #64748b;
+  display: flex;
+  flex: 1;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 12px;
+}
+
+.upcoming-maintenance-search:focus-within {
+  border-color: #10b981;
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.15);
+}
+
+.upcoming-maintenance-search svg {
+  flex-shrink: 0;
+}
+
+.upcoming-maintenance-search input {
+  background: transparent;
+  border: 0;
+  color: #0f172a;
+  font-family: inherit;
+  font-size: 14px;
+  min-width: 0;
+  outline: none;
+  width: 100%;
+}
+
+.upcoming-maintenance-search input::placeholder {
+  color: #94a3b8;
+}
+
+.upcoming-maintenance-filter-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.upcoming-maintenance-filter-controls select {
+  background: #fff;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  color: #334155;
+  font-family: inherit;
+  font-size: 14px;
+  min-height: 40px;
+  outline: none;
+  padding: 8px 12px;
+}
+
+.upcoming-maintenance-filter-controls select:focus {
+  border-color: #10b981;
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.15);
+}
+
+/* Table */
+
+.upcoming-maintenance-table-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+  overflow: hidden;
+}
+
+.upcoming-maintenance-table-wrapper {
+  overflow-x: auto;
+}
+
+.upcoming-maintenance-table {
+  border-collapse: collapse;
+  min-width: 1050px;
+  text-align: left;
+  width: 100%;
+}
+
+.upcoming-maintenance-table thead {
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.upcoming-maintenance-table th {
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  padding: 12px 24px;
+  text-align: left;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.upcoming-maintenance-table tbody {
+  background: #fff;
+}
+
+.upcoming-maintenance-table tbody tr {
+  border-bottom: 1px solid #e2e8f0;
+  transition: background-color 0.15s ease;
+}
+
+.upcoming-maintenance-table tbody tr:hover {
+  background: #f8fafc;
+}
+
+.upcoming-maintenance-table tbody tr:last-child {
+  border-bottom: 0;
+}
+
+.upcoming-maintenance-table td {
+  color: #334155;
+  font-size: 14px;
+  padding: 16px 24px;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+/* Plan */
+
+.upcoming-maintenance-plan-title {
+  color: #0f172a;
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  max-width: 300px;
+  overflow: hidden;
+  text-decoration: none;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.upcoming-maintenance-plan-title:hover {
+  color: #047857;
+}
+
+.upcoming-maintenance-plan-code {
+  color: #64748b;
+  display: block;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 12px;
+  margin-top: 3px;
+}
+
+/* Asset */
+
+.upcoming-maintenance-asset-name {
+  color: #1e293b;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.upcoming-maintenance-asset-code {
+  color: #64748b;
+  display: block;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 12px;
+  margin-top: 3px;
+}
+
+/* Frequency */
+
+.upcoming-maintenance-frequency {
+  background: #f1f5f9;
+  border-radius: 6px;
+  color: #334155;
+  display: inline-flex;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 5px 10px;
+}
+
+/* Due date */
+
+.upcoming-maintenance-due-date {
+  color: #334155;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 13px;
+}
+
+.upcoming-maintenance-due-date-overdue {
+  color: #dc2626;
+  font-weight: 600;
+}
+
+/* Status */
+
+.upcoming-maintenance-status {
+  border-radius: 999px;
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 4px 10px;
+  white-space: nowrap;
+}
+
+.upcoming-maintenance-status-overdue {
+  background: #fef2f2;
+  border: 1px solid rgba(254, 202, 202, 0.6);
+  color: #b91c1c;
+}
+
+.upcoming-maintenance-status-due-soon {
+  background: #fffbeb;
+  border: 1px solid rgba(253, 230, 138, 0.6);
+  color: #b45309;
+}
+
+.upcoming-maintenance-status-scheduled {
+  background: #eff6ff;
+  border: 1px solid rgba(191, 219, 254, 0.6);
+  color: #1d4ed8;
+}
+
+/* Empty state */
+
+.upcoming-maintenance-empty {
+  padding: 56px 24px;
+  text-align: center;
+}
+
+.upcoming-maintenance-empty h3 {
+  color: #0f172a;
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.upcoming-maintenance-empty p {
+  color: #64748b;
+  font-size: 14px;
+  margin: 5px 0 0;
+}
+
+/* Responsive */
+
+@media (max-width: 900px) {
+  .upcoming-maintenance-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .upcoming-maintenance-filters {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .upcoming-maintenance-filter-controls {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .upcoming-maintenance-filter-controls select {
+    width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .upcoming-maintenance-stat-card {
+    min-height: 110px;
+  }
+
+  .upcoming-maintenance-filters {
+    padding: 16px;
+  }
+
+  .upcoming-maintenance-filter-controls {
+    grid-template-columns: 1fr;
+  }
+
+  .upcoming-maintenance-table th,
+  .upcoming-maintenance-table td {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+}

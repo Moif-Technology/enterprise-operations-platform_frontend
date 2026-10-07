@@ -1,17 +1,12 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import PageHeader from "@/components/ui/PageHeader";
-import FilterBar from "@/components/ui/FilterBar";
 import SearchInput from "@/components/ui/SearchInput";
-import FormField from "@/components/ui/FormField";
-import {
-  Badge,
-  Button,
-  Panel,
-} from "@/components/ui/design-system";
+import { Badge, Button } from "@/components/ui/design-system";
 import {
   EmptyState,
   ErrorState,
@@ -24,6 +19,7 @@ import {
   getContractLifecycleStatus,
   isContractExpiringWithin30Days,
 } from "@/modules/assets/service";
+
 import type {
   Contract,
   ContractStatus,
@@ -31,7 +27,9 @@ import type {
   Customer,
 } from "@/modules/assets/types";
 
-function getLifecycleLabel(status: ReturnType<typeof getContractLifecycleStatus>) {
+function getLifecycleLabel(
+  status: ReturnType<typeof getContractLifecycleStatus>,
+) {
   switch (status) {
     case "scheduled":
       return "Scheduled";
@@ -119,25 +117,29 @@ export function ContractList() {
 
   const filteredContracts = useMemo(() => {
     const normalizedSearch = search.trim().toLowerCase();
-  
+
     return contracts.filter((contract) => {
       const matchesSearch =
         !normalizedSearch ||
-        contract.contractNumber.toLowerCase().includes(normalizedSearch) ||
-        contract.title.toLowerCase().includes(normalizedSearch);
-  
+        contract.contractNumber
+          .toLowerCase()
+          .includes(normalizedSearch) ||
+        contract.title
+          .toLowerCase()
+          .includes(normalizedSearch);
+
       const matchesCustomer =
         !customerId || contract.customerId === customerId;
-  
+
       const matchesType =
         !type || contract.type === type;
-  
+
       const matchesStatus =
         !status ||
         (status === "expiring-soon"
           ? isContractExpiringWithin30Days(contract)
           : getContractLifecycleStatus(contract) === status);
-  
+
       return (
         matchesSearch &&
         matchesCustomer &&
@@ -145,7 +147,13 @@ export function ContractList() {
         matchesStatus
       );
     });
-  }, [contracts, search, customerId, type, status]);
+  }, [
+    contracts,
+    search,
+    customerId,
+    type,
+    status,
+  ]);
 
   const hasActiveFilters =
     search.trim() !== "" ||
@@ -160,19 +168,13 @@ export function ContractList() {
     setStatus("");
   };
 
-  const openContract = (contractId: string) => {
-    router.push(`/contracts/${contractId}`);
-  };
-
   return (
-    <main className="w-full max-w-full space-y-6">
+    <main className="contracts-page">
       <PageHeader
-        eyebrow="Contracts"
         title="Contracts & AMC"
         description="Manage customer contracts, AMC coverage, terms, and lifecycle records."
         action={
           <Button
-            variant="primary"
             onClick={() => router.push("/contracts/new")}
           >
             Create Contract
@@ -180,174 +182,257 @@ export function ContractList() {
         }
       />
 
-      <Panel
-        title="Contracts"
-        description="Review contract and AMC records."
-      >
-        <FilterBar>
+      <section className="contracts-filter-card">
+       
+
+        <div className="contracts-filter-grid">
           <SearchInput
             value={search}
             onChange={(event) => setSearch(event.target.value)}
-            placeholder="Search contract number or title..."
+            placeholder="Search by contract number or title"
+            className="contracts-search"
           />
 
-          <FormField
-            label="Customer"
-            name="contract-filter-customer"
-            type="select"
-            selectProps={{
-              value: customerId,
-              onChange: (event) => setCustomerId(event.target.value),
-            }}
+          <select
+            value={customerId}
+            onChange={(event) =>
+              setCustomerId(event.target.value)
+            }
+            className="contracts-filter-select"
+            aria-label="Filter by customer"
           >
             <option value="">All customers</option>
+
             {customers.map((customer) => (
-              <option key={customer.id} value={customer.id}>
+              <option
+                key={customer.id}
+                value={customer.id}
+              >
                 {customer.name}
               </option>
             ))}
-          </FormField>
-            
-          <FormField
-            label="Type"
-            name="contract-filter-type"
-            type="select"
-            selectProps={{
-              value: type,
-              onChange: (event) => setType(event.target.value),
-            }}
+          </select>
+
+          <select
+            value={type}
+            onChange={(event) =>
+              setType(event.target.value)
+            }
+            className="contracts-filter-select"
+            aria-label="Filter by type"
           >
             <option value="">All types</option>
+
             {CONTRACT_TYPES.map((contractType) => (
-              <option key={contractType} value={contractType}>
+              <option
+                key={contractType}
+                value={contractType}
+              >
                 {contractType}
               </option>
             ))}
-          </FormField>
+          </select>
 
-          <FormField
-            label="Status"
-            name="contract-filter-status"
-            type="select"
-            selectProps={{
-              value: status,
-              onChange: (event) => setStatus(event.target.value),
-            }}
+          <select
+            value={status}
+            onChange={(event) =>
+              setStatus(event.target.value)
+            }
+            className="contracts-filter-select"
+            aria-label="Filter by status"
           >
             <option value="">All statuses</option>
+
             {CONTRACT_STATUSES.map((contractStatus) => (
-              <option key={contractStatus} value={contractStatus}>
+              <option
+                key={contractStatus}
+                value={contractStatus}
+              >
                 {formatStatusLabel(contractStatus)}
               </option>
             ))}
-            <option value="expiring-soon">Expiring within 30 days</option>
-          </FormField>
 
-          {hasActiveFilters && (
+            <option value="expiring-soon">
+              Expiring within 30 days
+            </option>
+          </select>
+        </div>
+
+        {hasActiveFilters && (
+          <div className="contracts-filter-actions">
             <Button
               variant="secondary"
+              size="sm"
               onClick={clearFilters}
             >
               Clear filters
             </Button>
-          )}
-        </FilterBar>
+          </div>
+        )}
+      </section>
 
-        <div className="mt-6">
-          {loading ? (
-            <LoadingState message="Loading contracts..." />
-          ) : error ? (
-            <ErrorState message={error} />
-          ) : contracts.length === 0 ? (
-            <EmptyState
-              title="No contracts yet"
-              description="Create a contract or AMC record to get started."
-              actionLabel="Create Contract"
-              onAction={() => router.push("/contracts/new")}
-            />
-          ) : filteredContracts.length === 0 ? (
-            <EmptyState
-              title="No matching contracts"
-              description="Try changing your search or filters."
-              actionLabel="Clear filters"
-              onAction={clearFilters}
-            />
-          ) : (
-            <div className="overflow-x-auto rounded-xl border border-border bg-card shadow-sm">
-              <table className="w-full border-collapse text-left text-sm min-w-[950px] table-fixed">
-                <colgroup>
-                  <col className="w-[14%]" />
-                  <col className="w-[24%]" />
-                  <col className="w-[18%]" />
-                  <col className="w-[10%]" />
-                  <col className="w-[12%]" />
-                  <col className="w-[12%]" />
-                  <col className="w-[10%]" />
-                </colgroup>
-                <thead className="bg-muted/50 text-xs font-semibold uppercase tracking-wider text-muted-foreground border-b border-border">
-                  <tr>
-                    <th className="px-5 py-3.5">Contract number</th>
-                    <th className="px-5 py-3.5">Title</th>
-                    <th className="px-5 py-3.5">Customer</th>
-                    <th className="px-5 py-3.5">Type</th>
-                    <th className="px-5 py-3.5">Start date</th>
-                    <th className="px-5 py-3.5">End date</th>
-                    <th className="px-5 py-3.5">Status</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border">
-                  {filteredContracts.map((contract) => {
-                    const lifecycleStatus = getContractLifecycleStatus(contract);
-                    return (
-                      <tr
-                        key={contract.id}
-                        onClick={() => openContract(contract.id)}
-                        className="cursor-pointer transition-colors hover:bg-muted/40 group"
-                      >
-                        <td className="px-5 py-4 font-medium text-foreground truncate">
+      <section className="contracts-table-card">
+        {loading ? (
+          <LoadingState message="Loading contracts..." />
+        ) : error ? (
+          <ErrorState message={error} />
+        ) : contracts.length === 0 ? (
+          <EmptyState
+            title="No contracts yet"
+            description="Create a contract or AMC record to get started."
+            actionLabel="Create Contract"
+            onAction={() => router.push("/contracts/new")}
+          />
+        ) : filteredContracts.length === 0 ? (
+          <EmptyState
+            title="No matching contracts"
+            description="Try changing your search or filters."
+            actionLabel="Clear filters"
+            onAction={clearFilters}
+          />
+        ) : (
+          <div className="contracts-table-wrapper">
+            <table className="contracts-table">
+              <thead>
+                <tr>
+                  <th>CONTRACT NUMBER</th>
+                  <th>TITLE</th>
+                  <th>CUSTOMER</th>
+                  <th>TYPE</th>
+                  <th>START DATE</th>
+                  <th>END DATE</th>
+                  <th>STATUS</th>
+                  <th>ACTIONS</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {filteredContracts.map((contract) => {
+                  const lifecycleStatus =
+                    getContractLifecycleStatus(contract);
+
+                  return (
+                    <tr key={contract.id}>
+                      <td>
+                        <span className="contracts-number">
                           {contract.contractNumber}
-                        </td>
-                        <td className="px-5 py-4 text-foreground truncate" title={contract.title}>
+                        </span>
+                      </td>
+
+                      <td>
+                        <span
+                          className="contracts-title"
+                          title={contract.title}
+                        >
                           {contract.title}
-                        </td>
-                        <td className="px-5 py-4 text-muted-foreground truncate">
-                          {customerNameById.get(contract.customerId) ?? "Unknown customer"}
-                        </td>
-                        <td className="px-5 py-4 text-muted-foreground truncate">
+                        </span>
+                      </td>
+
+                      <td>
+                        <span className="contracts-customer">
+                          {customerNameById.get(
+                            contract.customerId,
+                          ) ?? "Unknown customer"}
+                        </span>
+                      </td>
+
+                      <td>
+                        <span className="contracts-type">
                           {contract.type}
-                        </td>
-                        <td className="px-5 py-4 text-muted-foreground whitespace-nowrap">
+                        </span>
+                      </td>
+
+                      <td>
+                        <span className="contracts-date">
                           {formatDate(contract.startDate)}
-                        </td>
-                        <td className="px-5 py-4 text-muted-foreground whitespace-nowrap">
+                        </span>
+                      </td>
+
+                      <td>
+                        <span className="contracts-date">
                           {formatDate(contract.endDate)}
-                        </td>
-                        <td className="px-5 py-4 whitespace-nowrap">
-                          <Badge
-                            tone={
-                              lifecycleStatus === "active"
-                                ? "success"
-                                : lifecycleStatus === "scheduled"
+                        </span>
+                      </td>
+
+                      <td>
+                        <Badge
+                          tone={
+                            lifecycleStatus === "active"
+                              ? "success"
+                              : lifecycleStatus === "scheduled"
                                 ? "info"
                                 : lifecycleStatus === "expired"
-                                ? "danger"
-                                : lifecycleStatus === "draft"
-                                ? "warning"
-                                : "neutral"
-                            }
+                                  ? "danger"
+                                  : lifecycleStatus === "draft"
+                                    ? "warning"
+                                    : "neutral"
+                          }
+                        >
+                          {getLifecycleLabel(
+                            lifecycleStatus,
+                          )}
+                        </Badge>
+                      </td>
+
+                      <td>
+                        <div className="contract-row-actions">
+                          <Link
+                            href={`/contracts/${contract.id}`}
+                            className="contract-icon-button"
+                            aria-label={`View ${contract.contractNumber}`}
+                            title="View contract"
                           >
-                            {getLifecycleLabel(lifecycleStatus)}
-                          </Badge>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
-      </Panel>
+                            <svg
+                              width="18"
+                              height="18"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              aria-hidden="true"
+                            >
+                              <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z" />
+                              <circle
+                                cx="12"
+                                cy="12"
+                                r="2.5"
+                              />
+                            </svg>
+                          </Link>
+
+                          <Link
+                            href={`/contracts/${contract.id}/edit`}
+                            className="contract-icon-button"
+                            aria-label={`Edit ${contract.contractNumber}`}
+                            title="Edit contract"
+                          >
+                            <svg
+                              width="18"
+                              height="18"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              aria-hidden="true"
+                            >
+                           
+                              <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z" />
+                            </svg>
+                          </Link>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
     </main>
   );
 }

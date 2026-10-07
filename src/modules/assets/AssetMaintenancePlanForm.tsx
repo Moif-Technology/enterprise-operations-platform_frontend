@@ -1,12 +1,10 @@
-
 "use client";
 
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import Link from "next/link";
 
 import PageHeader from "@/components/ui/PageHeader";
-import FormField from "@/components/ui/FormField";
-import { Button, Panel } from "@/components/ui/design-system";
+import { Button } from "@/components/ui/design-system";
 
 import {
   getAssets,
@@ -36,6 +34,8 @@ type FormValues = {
   status: MaintenancePlanStatus;
 };
 
+type FormErrors = Partial<Record<keyof FormValues, string>>;
+
 const EMPTY_VALUES: FormValues = {
   assetId: "",
   planName: "",
@@ -54,7 +54,10 @@ export default function AssetMaintenancePlanForm({
   const isView = mode === "view";
 
   const assets = useMemo(() => getAssets(), []);
-  const maintenancePlans = useMemo(() => getMaintenancePlans(), []);
+  const maintenancePlans = useMemo(
+    () => getMaintenancePlans(),
+    [],
+  );
 
   const [values, setValues] = useState<FormValues>(() => {
     if (!plan) {
@@ -71,11 +74,12 @@ export default function AssetMaintenancePlanForm({
       status: plan.status,
     };
   });
+
   useEffect(() => {
     if (!plan) {
       return;
     }
-  
+
     setValues({
       assetId: plan.assetId,
       planName: plan.planName,
@@ -86,10 +90,14 @@ export default function AssetMaintenancePlanForm({
       status: plan.status,
     });
   }, [plan]);
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [success, setSuccess] = useState(false);
 
-  const selectedAsset = assets.find((asset) => asset.id === values.assetId);
+  const [errors, setErrors] = useState<FormErrors>({});
+  const [success, setSuccess] = useState(false);
+  const [submitError, setSubmitError] = useState("");
+
+  const selectedAsset = assets.find(
+    (asset) => asset.id === values.assetId,
+  );
 
   const updateValue = <K extends keyof FormValues>(
     field: K,
@@ -102,29 +110,38 @@ export default function AssetMaintenancePlanForm({
 
     setErrors((current) => ({
       ...current,
-      [field]: "",
+      [field]: undefined,
     }));
 
+    setSubmitError("");
     setSuccess(false);
   };
 
   const validate = () => {
-    const nextErrors: Record<string, string> = {};
+    const nextErrors: FormErrors = {};
 
     if (!values.assetId) {
-      nextErrors.assetId = "Select an asset.";
+      nextErrors.assetId = "Asset is required.";
     }
 
     if (!values.planName.trim()) {
-      nextErrors.planName = "Enter a maintenance plan name.";
+      nextErrors.planName = "Plan name is required.";
+    }
+
+    if (!values.frequency) {
+      nextErrors.frequency = "Frequency is required.";
+    }
+
+    if (!values.status) {
+      nextErrors.status = "Status is required.";
     }
 
     if (!values.startDate) {
-      nextErrors.startDate = "Select a start date.";
+      nextErrors.startDate = "Start date is required.";
     }
 
     if (!values.nextDueDate) {
-      nextErrors.nextDueDate = "Select the next due date.";
+      nextErrors.nextDueDate = "Next due date is required.";
     }
 
     if (
@@ -139,8 +156,16 @@ export default function AssetMaintenancePlanForm({
     return nextErrors;
   };
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (
+    event: FormEvent<HTMLFormElement>,
+  ) => {
     event.preventDefault();
+
+    if (isView) {
+      return;
+    }
+
+    setSubmitError("");
 
     const validationErrors = validate();
 
@@ -155,10 +180,28 @@ export default function AssetMaintenancePlanForm({
       .map((item) => item.trim())
       .filter(Boolean);
 
-      const existingPlan = plan;
+    const existingPlan = plan;
+
+    const duplicatePlan = maintenancePlans.some(
+      (item) =>
+        item.id !== existingPlan?.id &&
+        item.assetId === values.assetId &&
+        item.planName.trim().toLowerCase() ===
+          values.planName.trim().toLowerCase(),
+    );
+
+    if (duplicatePlan) {
+      setSubmitError(
+        "A maintenance plan with this name already exists for the selected asset.",
+      );
+      setSuccess(false);
+      return;
+    }
 
     const maintenancePlan: MaintenancePlan = {
-      id: existingPlan?.id ?? `plan-${Date.now()}`,
+      id:
+        existingPlan?.id ??
+        `plan-${Date.now()}`,
       assetId: values.assetId,
       planName: values.planName.trim(),
       frequency: values.frequency,
@@ -168,213 +211,381 @@ export default function AssetMaintenancePlanForm({
       status: values.status,
     };
 
-    saveMaintenancePlan(maintenancePlan);
-
-    setSuccess(true);
+    try {
+      saveMaintenancePlan(maintenancePlan);
+      setSuccess(true);
+    } catch {
+      setSubmitError(
+        "Unable to save the maintenance plan. Please try again.",
+      );
+      setSuccess(false);
+    }
   };
 
   return (
-    <div className="space-y-6">
+    <main className="maintenance-plan-form-page">
       <PageHeader
         title={
-            isView
-              ? "Maintenance Plan"
-              : isEdit
-                ? "Edit Maintenance Plan"
-                : "Create Maintenance Plan"
-          }
-          description={
-            isView
-              ? "View the maintenance schedule and checklist."
-              : isEdit
-                ? "Update the maintenance schedule and checklist."
-                : "Create a preventive maintenance schedule for an asset."
-          }
+          isView
+            ? "Maintenance Plan"
+            : isEdit
+              ? "Edit Maintenance Plan"
+              : "Create Maintenance Plan"
+        }
+        description={
+          isView
+            ? "View the maintenance schedule and checklist."
+            : isEdit
+              ? "Update the maintenance schedule and checklist."
+              : "Create a preventive maintenance schedule for an asset."
+        }
         action={
-          <Link href="/maintenance-plans">
-            <Button variant="secondary">Back to Maintenance Plans</Button>
-          </Link>
+          <div className="maintenance-plan-form-header-actions">
+            <Link href="/maintenance-plans">
+              <Button
+                variant="secondary"
+                type="button"
+              >
+                Cancel
+              </Button>
+            </Link>
+
+            {!isView && (
+              <Button type="submit" form="maintenance-plan-form">
+                {isEdit
+                  ? "Save Changes"
+                  : "Create Maintenance Plan"}
+              </Button>
+            )}
+          </div>
         }
       />
 
       {success && (
-        <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">
+        <div
+          className="maintenance-plan-form-success"
+          role="status"
+        >
           Maintenance plan saved successfully.
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <Panel
-          title="Plan Details"
-          description="Select the asset and define the maintenance schedule."
+      {submitError && (
+        <div
+          className="maintenance-plan-form-error"
+          role="alert"
         >
-          <div className="grid gap-5 md:grid-cols-2">
-            <FormField
-              name="assetId"
-              label="Asset"
-              required
-              error={errors.assetId}
-              selectProps={{
-                disabled: isView,
-                value: values.assetId,
-                onChange: (event) =>
-                  updateValue("assetId", event.target.value),
-              }}
-            >
-              <option value="">Select an asset</option>
-              {assets.map((asset: Asset) => (
-                <option key={asset.id} value={asset.id}>
-                  {asset.name} ({asset.assetCode})
-                </option>
-              ))}
-            </FormField>
+          {submitError}
+        </div>
+      )}
 
-            <FormField
-              name="planName"
-              label="Plan Name"
-              required
-              error={errors.planName}
-              inputProps={{
-                disabled: isView,
-                value: values.planName,
-                onChange: (event) =>
-                  updateValue("planName", event.target.value),
-                placeholder: "e.g. AHU monthly filter and belt check",
-              }}
-            />
+      <form
+        id="maintenance-plan-form"
+        onSubmit={handleSubmit}
+        className="maintenance-plan-form"
+      >
+        <div className="maintenance-plan-form-grid">
+          <section className="maintenance-plan-form-card">
+            <div className="maintenance-plan-form-card-header">
+              <h3>Plan Details</h3>
+              <p>
+                Select the asset and define the maintenance
+                schedule.
+              </p>
+            </div>
 
-            <FormField
-              name="frequency"
-              label="Frequency"
-              required
-              selectProps={{
-                disabled: isView,
-                value: values.frequency,
-                onChange: (event) =>
-                  updateValue(
-                    "frequency",
-                    event.target.value as MaintenanceFrequency,
-                  ),
-              }}
-            >
-              <option value="weekly">Weekly</option>
-              <option value="monthly">Monthly</option>
-            </FormField>
+            <div className="maintenance-plan-form-fields">
+              <div className="maintenance-plan-form-field">
+                <label htmlFor="assetId">
+                  Asset{" "}
+                  <span className="maintenance-plan-form-required">
+                    *
+                  </span>
+                </label>
 
-            <FormField
-              name="status"
-              label="Status"
-              required
-              selectProps={{
-                disabled: isView,
-                value: values.status,
-                onChange: (event) =>
-                  updateValue(
-                    "status",
-                    event.target.value as MaintenancePlanStatus,
-                  ),
-              }}
-            >
-              <option value="active">Active</option>
-              <option value="paused">Paused</option>
-            </FormField>
+                <select
+                  id="assetId"
+                  value={values.assetId}
+                  disabled={isView}
+                  onChange={(event) =>
+                    updateValue(
+                      "assetId",
+                      event.target.value,
+                    )
+                  }
+                  className={
+                    errors.assetId
+                      ? "maintenance-plan-form-control-error"
+                      : ""
+                  }
+                >
+                  <option value="">
+                    Select asset
+                  </option>
 
-            <FormField
-              name="startDate"
-              label="Start Date"
-              required
-              error={errors.startDate}
-              inputProps={{
-                type: "date",
-                disabled: isView,
-                value: values.startDate,
-                onChange: (event) =>
-                  updateValue("startDate", event.target.value),
-              }}
-            />
+                  {assets.map((asset: Asset) => (
+                    <option
+                      key={asset.id}
+                      value={asset.id}
+                    >
+                      {asset.name} ({asset.assetCode})
+                    </option>
+                  ))}
+                </select>
 
-            <FormField
-              name="nextDueDate"
-              label="Next Due Date"
-              required
-              error={errors.nextDueDate}
-              inputProps={{
-                type: "date",
-                disabled: isView,
-                value: values.nextDueDate,
-                onChange: (event) =>
-                  updateValue("nextDueDate", event.target.value),
-              }}
-            />
-          </div>
-        </Panel>
-
-        <Panel
-          title="Checklist"
-          description="Enter one maintenance checklist item per line."
-        >
-          <FormField
-            name="checklist"
-            label="Checklist Items"
-            textareaProps={{
-                value: values.checklist,
-                disabled: isView,
-                onChange: (event) =>
-                  updateValue("checklist", event.target.value),
-                placeholder:
-                  "Inspect filters\nCheck belt condition\nRecord operating readings",
-                rows: 6,
-              }}
-          />
-        </Panel>
-
-        {selectedAsset && (
-          <Panel
-            title="Selected Asset"
-            description="Asset linked to this maintenance plan."
-          >
-            <div className="grid gap-4 md:grid-cols-3">
-              <div>
-                <p className="text-xs font-medium text-slate-500">Asset</p>
-                <p className="mt-1 text-sm font-semibold text-slate-900">
-                  {selectedAsset.name}
-                </p>
+                {errors.assetId && (
+                  <p className="maintenance-plan-form-field-error">
+                    {errors.assetId}
+                  </p>
+                )}
               </div>
 
-              <div>
-                <p className="text-xs font-medium text-slate-500">
-                  Asset Code
-                </p>
-                <p className="mt-1 text-sm font-semibold text-slate-900">
-                  {selectedAsset.assetCode}
-                </p>
+              <div className="maintenance-plan-form-field">
+                <label htmlFor="planName">
+                  Plan Name{" "}
+                  <span className="maintenance-plan-form-required">
+                    *
+                  </span>
+                </label>
+
+                <input
+                  id="planName"
+                  type="text"
+                  value={values.planName}
+                  disabled={isView}
+                  onChange={(event) =>
+                    updateValue(
+                      "planName",
+                      event.target.value,
+                    )
+                  }
+                  placeholder="e.g. AHU Monthly Filter & Belt Check"
+                  className={
+                    errors.planName
+                      ? "maintenance-plan-form-control-error"
+                      : ""
+                  }
+                />
+
+                {errors.planName && (
+                  <p className="maintenance-plan-form-field-error">
+                    {errors.planName}
+                  </p>
+                )}
               </div>
 
-              <div>
-                <p className="text-xs font-medium text-slate-500">Category</p>
-                <p className="mt-1 text-sm font-semibold text-slate-900">
-                  {selectedAsset.category}
-                </p>
+              <div className="maintenance-plan-form-field">
+                <label htmlFor="frequency">
+                  Frequency{" "}
+                  <span className="maintenance-plan-form-required">
+                    *
+                  </span>
+                </label>
+
+                <select
+                  id="frequency"
+                  value={values.frequency}
+                  disabled={isView}
+                  onChange={(event) =>
+                    updateValue(
+                      "frequency",
+                      event.target
+                        .value as MaintenanceFrequency,
+                    )
+                  }
+                  className={
+                    errors.frequency
+                      ? "maintenance-plan-form-control-error"
+                      : ""
+                  }
+                >
+                  <option value="monthly">
+                    Monthly
+                  </option>
+                  <option value="weekly">
+                    Weekly
+                  </option>
+                  <option value="quarterly">
+                    Quarterly
+                  </option>
+                  <option value="bi-annually">
+                    Bi-Annually
+                  </option>
+                  <option value="annually">
+                    Annually
+                  </option>
+                </select>
+
+                {errors.frequency && (
+                  <p className="maintenance-plan-form-field-error">
+                    {errors.frequency}
+                  </p>
+                )}
+              </div>
+
+              <div className="maintenance-plan-form-field">
+                <label htmlFor="status">
+                  Status{" "}
+                  <span className="maintenance-plan-form-required">
+                    *
+                  </span>
+                </label>
+
+                <select
+                  id="status"
+                  value={values.status}
+                  disabled={isView}
+                  onChange={(event) =>
+                    updateValue(
+                      "status",
+                      event.target
+                        .value as MaintenancePlanStatus,
+                    )
+                  }
+                  className={
+                    errors.status
+                      ? "maintenance-plan-form-control-error"
+                      : ""
+                  }
+                >
+                  <option value="active">
+                    Active
+                  </option>
+                  <option value="paused">
+                    Paused
+                  </option>
+                  <option value="draft">
+                    Draft
+                  </option>
+                </select>
+
+                {errors.status && (
+                  <p className="maintenance-plan-form-field-error">
+                    {errors.status}
+                  </p>
+                )}
+              </div>
+
+              <div className="maintenance-plan-form-field">
+                <label htmlFor="startDate">
+                  Start Date{" "}
+                  <span className="maintenance-plan-form-required">
+                    *
+                  </span>
+                </label>
+
+                <input
+                  id="startDate"
+                  type="date"
+                  value={values.startDate}
+                  disabled={isView}
+                  onChange={(event) =>
+                    updateValue(
+                      "startDate",
+                      event.target.value,
+                    )
+                  }
+                  className={
+                    errors.startDate
+                      ? "maintenance-plan-form-control-error"
+                      : ""
+                  }
+                />
+
+                {errors.startDate && (
+                  <p className="maintenance-plan-form-field-error">
+                    {errors.startDate}
+                  </p>
+                )}
+              </div>
+
+              <div className="maintenance-plan-form-field">
+                <label htmlFor="nextDueDate">
+                  Next Due Date{" "}
+                  <span className="maintenance-plan-form-required">
+                    *
+                  </span>
+                </label>
+
+                <input
+                  id="nextDueDate"
+                  type="date"
+                  value={values.nextDueDate}
+                  disabled={isView}
+                  onChange={(event) =>
+                    updateValue(
+                      "nextDueDate",
+                      event.target.value,
+                    )
+                  }
+                  className={
+                    errors.nextDueDate
+                      ? "maintenance-plan-form-control-error"
+                      : ""
+                  }
+                />
+
+                {errors.nextDueDate && (
+                  <p className="maintenance-plan-form-field-error">
+                    {errors.nextDueDate}
+                  </p>
+                )}
               </div>
             </div>
-          </Panel>
-        )}
+          </section>
 
-        <div className="flex items-center justify-end gap-3">
-          <Link href="/maintenance-plans">
-            <Button variant="secondary" type="button">
-              Cancel
-            </Button>
-          </Link>
+          <section className="maintenance-plan-form-card">
+            <div className="maintenance-plan-form-card-header">
+              <h3>Maintenance Checklist</h3>
+              <p>
+                Enter one maintenance checklist item per
+                line.
+              </p>
+            </div>
 
-          {!isView && (
-  <Button type="submit">
-    {isEdit ? "Save Changes" : "Create Maintenance Plan"}
-  </Button>
-)}
+            <div className="maintenance-plan-form-field">
+              <label htmlFor="checklist">
+                Checklist Items
+              </label>
+
+              <textarea
+                id="checklist"
+                value={values.checklist}
+                disabled={isView}
+                onChange={(event) =>
+                  updateValue(
+                    "checklist",
+                    event.target.value,
+                  )
+                }
+                placeholder={
+                  "1. Inspect filter condition\n2. Check belt tension\n3. Clean blower housing"
+                }
+                rows={6}
+              />
+            </div>
+          </section>
         </div>
+
+        {selectedAsset && (
+          <section className="maintenance-plan-selected-asset">
+            <div>
+              <span>Selected Asset</span>
+              <strong>{selectedAsset.name}</strong>
+            </div>
+
+            <div>
+              <span>Asset Code</span>
+              <strong>{selectedAsset.assetCode}</strong>
+            </div>
+
+            <div>
+              <span>Category</span>
+              <strong>{selectedAsset.category}</strong>
+            </div>
+          </section>
+        )}
       </form>
-    </div>
+    </main>
   );
 }
-

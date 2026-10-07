@@ -4,10 +4,8 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 
 import PageHeader from "@/components/ui/PageHeader";
-import FilterBar from "@/components/ui/FilterBar";
 import SearchInput from "@/components/ui/SearchInput";
-
-import { Badge, Button, Panel } from "@/components/ui/design-system";
+import { Badge, Button } from "@/components/ui/design-system";
 
 import {
   getAssets,
@@ -21,10 +19,12 @@ import type {
 
 export default function MaintenancePlanList() {
   const [search, setSearch] = useState("");
-  const [frequency, setFrequency] = useState<MaintenanceFrequency | "all">(
-    "all",
-  );
-  const [status, setStatus] = useState<MaintenancePlanStatus | "all">("all");
+  const [frequency, setFrequency] = useState<
+    MaintenanceFrequency | "all"
+  >("all");
+  const [status, setStatus] = useState<
+    MaintenancePlanStatus | "all"
+  >("all");
 
   const plans = getMaintenancePlans();
   const assets = getAssets();
@@ -33,7 +33,9 @@ export default function MaintenancePlanList() {
     const query = search.trim().toLowerCase();
 
     return plans.filter((plan) => {
-      const asset = assets.find((item) => item.id === plan.assetId);
+      const asset = assets.find(
+        (item) => item.id === plan.assetId,
+      );
 
       const matchesSearch =
         !query ||
@@ -42,43 +44,63 @@ export default function MaintenancePlanList() {
         asset?.assetCode.toLowerCase().includes(query);
 
       const matchesFrequency =
-        frequency === "all" || plan.frequency === frequency;
+        frequency === "all" ||
+        plan.frequency === frequency;
 
-      const matchesStatus = status === "all" || plan.status === status;
+      const matchesStatus =
+        status === "all" ||
+        plan.status === status;
 
-      return matchesSearch && matchesFrequency && matchesStatus;
+      return (
+        matchesSearch &&
+        matchesFrequency &&
+        matchesStatus
+      );
     });
   }, [plans, assets, search, frequency, status]);
 
   return (
-    
-  <div className="space-y-6">
-    <PageHeader
-  title="Maintenance Plans"
-  description="Manage preventive maintenance schedules for registered assets."
-  action={
-    <Link href="/maintenance-plans/new" className="no-underline">
-      <Button variant="primary">Create</Button>
-    </Link>
-  }
-/>
+    <div className="maintenance-plans-page">
+      <PageHeader
+        title="Maintenance Plans"
+        description="Manage preventive maintenance schedules for registered assets."
+        action={
+          <Link
+            href="/maintenance-plans/new"
+            className="maintenance-plans-create-link"
+          >
+            <Button size="sm">
+              <span aria-hidden="true"></span>
+              Create Plan
+            </Button>
+          </Link>
+        }
+      />
 
-    <Panel title="Filters">
-        <FilterBar>
+      <section className="maintenance-plans-filter-card">
+       
+
+        <div className="maintenance-plans-filter-fields">
           <SearchInput
             value={search}
-            onChange={(event) => setSearch(event.target.value)}
+            onChange={(event) =>
+              setSearch(event.target.value)
+            }
             placeholder="Search plans, assets, or asset codes..."
+            className="maintenance-plans-search"
           />
 
           <select
             value={frequency}
             onChange={(event) =>
               setFrequency(
-                event.target.value as MaintenanceFrequency | "all",
+                event.target.value as
+                  | MaintenanceFrequency
+                  | "all",
               )
             }
-            className="h-10 rounded-md border border-gray-300 bg-white px-3 text-sm"
+            className="maintenance-plans-filter-select"
+            aria-label="Filter maintenance plans by frequency"
           >
             <option value="all">All frequencies</option>
             <option value="weekly">Weekly</option>
@@ -89,40 +111,41 @@ export default function MaintenancePlanList() {
             value={status}
             onChange={(event) =>
               setStatus(
-                event.target.value as MaintenancePlanStatus | "all",
+                event.target.value as
+                  | MaintenancePlanStatus
+                  | "all",
               )
             }
-            className="h-10 rounded-md border border-gray-300 bg-white px-3 text-sm"
+            className="maintenance-plans-filter-select"
+            aria-label="Filter maintenance plans by status"
           >
             <option value="all">All statuses</option>
             <option value="active">Active</option>
             <option value="paused">Paused</option>
           </select>
-        </FilterBar>
-      </Panel>
+        </div>
+      </section>
 
-      <Panel title="Maintenance Plans">
+      <section className="maintenance-plans-table-card">
         {filteredPlans.length === 0 ? (
-          <div className="py-12 text-center">
-            <h3 className="text-base font-semibold text-gray-900">
-              No maintenance plans found
-            </h3>
-            <p className="mt-1 text-sm text-gray-500">
+          <div className="maintenance-plans-empty-state">
+            <h3>No maintenance plans found</h3>
+            <p>
               Try changing your search or filters.
             </p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[900px] text-left text-sm">
+          <div className="maintenance-plans-table-wrapper">
+            <table className="maintenance-plans-table">
               <thead>
-                <tr className="border-b border-gray-200 text-xs uppercase tracking-wide text-gray-500">
-                  <th className="px-4 py-3 font-medium">Plan</th>
-                  <th className="px-4 py-3 font-medium">Asset</th>
-                  <th className="px-4 py-3 font-medium">Frequency</th>
-                  <th className="px-4 py-3 font-medium">Start Date</th>
-                  <th className="px-4 py-3 font-medium">Next Due</th>
-                  <th className="px-4 py-3 font-medium">Status</th>
-                  <th className="px-4 py-3 font-medium">Action</th>
+                <tr>
+                  <th>Plan</th>
+                  <th>Asset</th>
+                  <th>Frequency</th>
+                  <th>Start Date</th>
+                  <th>Next Due</th>
+                  <th>Status</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
 
@@ -133,74 +156,115 @@ export default function MaintenancePlanList() {
                   );
 
                   return (
-                    <tr
-                      key={plan.id}
-                      className="border-b border-gray-100 last:border-0"
-                    >
-                      <td className="px-4 py-4">
-                        <div className="font-medium text-gray-900">
+                    <tr key={plan.id}>
+                      <td>
+                        <div className="maintenance-plan-name">
                           {plan.planName}
                         </div>
-                        <div className="mt-1 text-xs text-gray-500">
+
+                        <div className="maintenance-plan-code">
                           {plan.id}
                         </div>
                       </td>
 
-                      <td className="px-4 py-4">
+                      <td>
                         {asset ? (
                           <Link
                             href={`/assets/${asset.id}`}
-                            className="font-medium text-gray-900 hover:underline"
+                            className="maintenance-plan-asset-link"
                           >
-                            {asset.name}
+                            <span>
+                              {asset.name}
+                            </span>
+
+                            <span className="maintenance-plan-asset-code">
+                              {asset.assetCode}
+                            </span>
                           </Link>
                         ) : (
-                          <span className="text-gray-500">
+                          <span className="maintenance-plan-unavailable">
                             Asset unavailable
                           </span>
                         )}
-
-                        {asset && (
-                          <div className="mt-1 text-xs text-gray-500">
-                            {asset.assetCode}
-                          </div>
-                        )}
                       </td>
 
-                      <td className="px-4 py-4 capitalize text-gray-700">
-                        {plan.frequency}
+                      <td>
+                        <span className="maintenance-plan-frequency">
+                          {plan.frequency}
+                        </span>
                       </td>
 
-                      <td className="px-4 py-4 text-gray-700">
-                        {plan.startDate}
+                      <td>
+                        <span className="maintenance-plan-date">
+                          {plan.startDate}
+                        </span>
                       </td>
 
-                      <td className="px-4 py-4 font-medium text-gray-900">
-                        {plan.nextDueDate}
+                      <td>
+                        <span className="maintenance-plan-date">
+                          {plan.nextDueDate}
+                        </span>
                       </td>
 
-                      <td className="px-4 py-4">
-                      <Badge tone={plan.status === "active" ? "success" : "neutral"}>
+                      <td>
+                        <span
+                          className={`maintenance-plan-status maintenance-plan-status-${plan.status}`}
+                        >
                           {plan.status}
-                        </Badge>
+                        </span>
                       </td>
-                      <td className="px-4 py-4">
-  <div className="flex items-center gap-3">
-    <Link
-      href={`/maintenance-plans/${plan.id}`}
-      className="font-medium text-gray-900 hover:underline"
-    >
-      View
-    </Link>
 
-    <Link
-      href={`/maintenance-plans/${plan.id}/edit`}
-      className="font-medium text-gray-900 hover:underline"
-    >
-      Edit
-    </Link>
-  </div>
-</td>
+                      <td>
+                        <div className="maintenance-plan-actions">
+                          <Link
+                            href={`/maintenance-plans/${plan.id}`}
+                            className="maintenance-plan-icon-button"
+                            aria-label={`View ${plan.planName}`}
+                            title="View maintenance plan"
+                          >
+                            <svg
+                              width="17"
+                              height="17"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              aria-hidden="true"
+                            >
+                              <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z" />
+                              <circle
+                                cx="12"
+                                cy="12"
+                                r="2.5"
+                              />
+                            </svg>
+                          </Link>
+
+                          <Link
+                            href={`/maintenance-plans/${plan.id}/edit`}
+                            className="maintenance-plan-icon-button"
+                            aria-label={`Edit ${plan.planName}`}
+                            title="Edit maintenance plan"
+                          >
+                            <svg
+                              width="17"
+                              height="17"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              aria-hidden="true"
+                            >
+                           
+                              <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L8 18l-4 1-1-4Z" />
+                            </svg>
+                          </Link>
+                        </div>
+                      </td>
                     </tr>
                   );
                 })}
@@ -208,7 +272,7 @@ export default function MaintenancePlanList() {
             </table>
           </div>
         )}
-      </Panel>
+      </section>
     </div>
   );
 }
