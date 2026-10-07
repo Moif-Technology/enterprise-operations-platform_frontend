@@ -1,21 +1,37 @@
 "use client";
 
-import { FormEvent, useMemo, useState } from "react";
+import { useMemo, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 
+import Link from "next/link";
+
 import PageHeader from "@/components/ui/PageHeader";
-import { Badge, Button, Panel } from "@/components/ui/design-system";
+import { Button } from "@/components/ui/design-system";
+
 import { getSites } from "@/modules/assets/service";
 import {
   getStockBalances,
   getStockLocations,
   saveStockLocation,
 } from "@/modules/inventory/service";
-import type { StockLocation, StockLocationType } from "@/modules/inventory/types";
+
+import type {
+  StockLocation,
+  StockLocationType,
+} from "@/modules/inventory/types";
 
 interface StockLocationFormProps {
   location?: StockLocation;
 }
+
+type FormErrors = {
+  code?: string;
+  name?: string;
+  type?: string;
+  status?: string;
+  siteOrTechnician?: string;
+  form?: string;
+};
 
 export default function StockLocationForm({
   location,
@@ -37,7 +53,7 @@ export default function StockLocationForm({
   const [status, setStatus] = useState<"active" | "inactive">(
     location?.status ?? "active",
   );
-  const [error, setError] = useState("");
+  const [errors, setErrors] = useState<FormErrors>({});
 
   const isEdit = Boolean(location);
 
@@ -45,52 +61,95 @@ export default function StockLocationForm({
     ? getStockBalances().some(
         (balance) =>
           balance.locationId === location.id && balance.quantity !== 0,
-      ) ||
-      getStockLocations().some(
-        (item) =>
-          item.id === location.id &&
-          item.id !== location.id,
       )
     : false;
 
+  const updateError = (field: keyof FormErrors) => {
+    setErrors((current) => ({
+      ...current,
+      [field]: "",
+      form: "",
+    }));
+  };
+
+  function handleTypeChange(nextType: StockLocationType) {
+    setType(nextType);
+    updateError("type");
+    updateError("siteOrTechnician");
+
+    if (nextType === "warehouse") {
+      setTechnicianName("");
+    } else {
+      setSiteId("");
+    }
+  }
+
+  function validate() {
+    const nextErrors: FormErrors = {};
+
+    if (!code.trim()) {
+      nextErrors.code = "Field is required.";
+    }
+
+    if (!name.trim()) {
+      nextErrors.name = "Field is required.";
+    }
+
+    if (!type) {
+      nextErrors.type = "Field is required.";
+    }
+
+    if (!status) {
+      nextErrors.status = "Field is required.";
+    }
+
+    if (type === "warehouse" && !siteId) {
+      nextErrors.siteOrTechnician = "Field is required.";
+    }
+
+    if (type === "technician" && !technicianName.trim()) {
+      nextErrors.siteOrTechnician = "Field is required.";
+    }
+
+    const trimmedCode = code.trim();
+
+    if (trimmedCode) {
+      const duplicate = locations.some(
+        (item) =>
+          item.id !== location?.id &&
+          item.code.trim().toLowerCase() === trimmedCode.toLowerCase(),
+      );
+
+      if (duplicate) {
+        nextErrors.code = "Location code must be unique.";
+      }
+    }
+
+    if (
+      type === "warehouse" &&
+      siteId &&
+      !sites.some((site) => site.id === siteId)
+    ) {
+      nextErrors.siteOrTechnician = "Please select a valid existing site.";
+    }
+
+    setErrors(nextErrors);
+
+    return Object.keys(nextErrors).length === 0;
+  }
+
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setError("");
+
+    setErrors({});
+
+    if (!validate()) {
+      return;
+    }
 
     const trimmedCode = code.trim();
     const trimmedName = name.trim();
     const trimmedTechnicianName = technicianName.trim();
-
-    if (!trimmedCode || !trimmedName || !type) {
-      setError("Location code, name, and type are required.");
-      return;
-    }
-
-    const duplicate = locations.some(
-      (item) =>
-        item.id !== location?.id &&
-        item.code.trim().toLowerCase() === trimmedCode.toLowerCase(),
-    );
-
-    if (duplicate) {
-      setError("Location code must be unique.");
-      return;
-    }
-
-    if (type === "warehouse" && !siteId) {
-      setError("A warehouse must be linked to an existing site.");
-      return;
-    }
-
-    if (type === "warehouse" && !sites.some((site) => site.id === siteId)) {
-      setError("Please select a valid existing site.");
-      return;
-    }
-
-    if (type === "technician" && !trimmedTechnicianName) {
-      setError("Technician name is required for technician stock.");
-      return;
-    }
 
     const savedLocation: StockLocation = {
       id: location?.id ?? `loc-${Date.now()}`,
@@ -106,18 +165,20 @@ export default function StockLocationForm({
 
     try {
       const result = saveStockLocation(savedLocation);
+
       router.push(`/inventory/stock-locations/${result.id}`);
     } catch (submitError) {
-      setError(
-        submitError instanceof Error
-          ? submitError.message
-          : "Unable to save the stock location.",
-      );
+      setErrors({
+        form:
+          submitError instanceof Error
+            ? submitError.message
+            : "Unable to save the stock location.",
+      });
     }
   }
 
   return (
-    <div className="space-y-6">
+    <div className="stock-location-form-page">
       <PageHeader
         eyebrow="Inventory"
         title={isEdit ? "Edit Stock Location" : "Create Stock Location"}
@@ -126,154 +187,256 @@ export default function StockLocationForm({
             ? "Update warehouse or technician stock information."
             : "Create a warehouse or technician stock location."
         }
+        action={
+          <div className="stock-location-form-header-actions">
+            <Link href="/inventory/stock-locations">
+              <Button variant="secondary" type="button">
+                Cancel
+              </Button>
+            </Link>
+
+            <Button type="submit" form="stock-location-form">
+              {isEdit ? "Save Changes" : "Create Stock Location"}
+            </Button>
+          </div>
+        }
       />
 
-      <Panel
-        title="Stock Location Details"
-        description="Use an existing Module 03 site for warehouse locations."
-      >
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {error && (
-            <div className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-              {error}
+      <section className="stock-location-form-card">
+        <div className="stock-location-form-card-header">
+          <h3>Stock Location Details</h3>
+          <p>
+            Define location details and link existing sites or technicians.
+          </p>
+        </div>
+
+        <form
+          id="stock-location-form"
+          onSubmit={handleSubmit}
+          className="stock-location-form"
+          noValidate
+        >
+          {errors.form && (
+            <div className="stock-location-form-error-summary">
+              {errors.form}
             </div>
           )}
 
           {isEdit && (
-            <div className="rounded-md border border-[#dfe4ea] bg-[#f6f7f9] px-4 py-3 text-sm text-[#647086]">
-              <strong className="text-[#162033]">Reference safety:</strong>{" "}
-              locations with stock or movement history cannot have their type
-              changed. Inactive locations remain available for historical
-              records.
+            <div className="stock-location-form-info">
+              <strong>Reference safety:</strong> locations with stock or
+              movement history cannot have their type changed. Inactive
+              locations remain available for historical records.
             </div>
           )}
 
-          <div className="grid gap-5 md:grid-cols-2">
-            <div>
-              <label className="mb-2 block text-sm font-medium text-[#162033]">
-                Location Code *
-              </label>
+          <div className="stock-location-form-fields">
+            <FormControl
+              label="Location Code"
+              required
+              error={errors.code}
+            >
               <input
                 value={code}
-                onChange={(event) => setCode(event.target.value)}
-                className="input w-full"
+                onChange={(event) => {
+                  setCode(event.target.value);
+                  updateError("code");
+                }}
+                className={getControlClassName(errors.code)}
                 placeholder="e.g. WH-HVM-C"
               />
-            </div>
+            </FormControl>
 
-            <div>
-              <label className="mb-2 block text-sm font-medium text-[#162033]">
-                Location Name *
-              </label>
+            <FormControl
+              label="Location Name"
+              required
+              error={errors.name}
+            >
               <input
                 value={name}
-                onChange={(event) => setName(event.target.value)}
-                className="input w-full"
+                onChange={(event) => {
+                  setName(event.target.value);
+                  updateError("name");
+                }}
+                className={getControlClassName(errors.name)}
                 placeholder="e.g. Harborview Central Warehouse"
               />
-            </div>
+            </FormControl>
 
-            <div>
-              <label className="mb-2 block text-sm font-medium text-[#162033]">
-                Location Type *
-              </label>
+            <FormControl
+              label="Location Type"
+              required
+              error={errors.type}
+            >
               <select
                 value={type}
                 onChange={(event) =>
-                  setType(event.target.value as StockLocationType)
+                  handleTypeChange(
+                    event.target.value as StockLocationType,
+                  )
                 }
-                className="input w-full"
+                className={getControlClassName(errors.type)}
+                disabled={isEdit && referencedLocation}
               >
                 <option value="warehouse">Warehouse</option>
                 <option value="technician">Technician</option>
               </select>
-            </div>
+            </FormControl>
 
-            <div>
-              <label className="mb-2 block text-sm font-medium text-[#162033]">
-                Status
-              </label>
+            <FormControl
+              label="Status"
+              required
+              error={errors.status}
+            >
               <select
                 value={status}
-                onChange={(event) =>
-                  setStatus(event.target.value as "active" | "inactive")
-                }
-                className="input w-full"
+                onChange={(event) => {
+                  setStatus(
+                    event.target.value as "active" | "inactive",
+                  );
+                  updateError("status");
+                }}
+                className={getControlClassName(errors.status)}
               >
                 <option value="active">Active</option>
                 <option value="inactive">Inactive</option>
               </select>
-            </div>
+            </FormControl>
 
             {type === "warehouse" && (
-              <div className="md:col-span-2">
-                <label className="mb-2 block text-sm font-medium text-[#162033]">
-                  Existing Site *
-                </label>
-                <select
-                  value={siteId}
-                  onChange={(event) => setSiteId(event.target.value)}
-                  className="input w-full"
+              <div className="stock-location-form-field stock-location-form-field-wide">
+                <FormControl
+                  label="Existing Site"
+                  required
+                  error={errors.siteOrTechnician}
                 >
-                  <option value="">Select existing site</option>
-                  {sites
-                    .filter(
-                      (site) =>
-                        site.status === "active" || site.id === location?.siteId,
-                    )
-                    .map((site) => (
-                      <option key={site.id} value={site.id}>
-                        {site.name} ({site.code})
-                      </option>
-                    ))}
-                </select>
-                <p className="mt-2 text-xs text-[#647086]">
-                  Warehouse locations reuse the existing customer/site records.
-                </p>
+                  <select
+                    value={siteId}
+                    onChange={(event) => {
+                      setSiteId(event.target.value);
+                      updateError("siteOrTechnician");
+                    }}
+                    className={getControlClassName(
+                      errors.siteOrTechnician,
+                    )}
+                  >
+                    <option value="">Select existing site</option>
+
+                    {sites
+                      .filter(
+                        (site) =>
+                          site.status === "active" ||
+                          site.id === location?.siteId,
+                      )
+                      .map((site) => (
+                        <option key={site.id} value={site.id}>
+                          {site.name} ({site.code})
+                        </option>
+                      ))}
+                  </select>
+                </FormControl>
+
+                <div className="stock-location-form-helper">
+                  <svg
+                    aria-hidden="true"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
+                    <circle cx="12" cy="12" r="9" />
+                    <path d="M12 10v6" />
+                    <path d="M12 7h.01" />
+                  </svg>
+
+                  <span>
+                    Warehouse locations reuse existing customer/site
+                    records for inventory tracking.
+                  </span>
+                </div>
               </div>
             )}
 
             {type === "technician" && (
-              <div className="md:col-span-2">
-                <label className="mb-2 block text-sm font-medium text-[#162033]">
-                  Technician Name *
-                </label>
-                <input
-                  value={technicianName}
-                  onChange={(event) => setTechnicianName(event.target.value)}
-                  className="input w-full"
-                  placeholder="e.g. R. Mehta"
-                />
+              <div className="stock-location-form-field stock-location-form-field-wide">
+                <FormControl
+                  label="Assign Technician"
+                  required
+                  error={errors.siteOrTechnician}
+                >
+                  <input
+                    value={technicianName}
+                    onChange={(event) => {
+                      setTechnicianName(event.target.value);
+                      updateError("siteOrTechnician");
+                    }}
+                    className={getControlClassName(
+                      errors.siteOrTechnician,
+                    )}
+                    placeholder="e.g. R. Mehta"
+                  />
+                </FormControl>
+
+                <div className="stock-location-form-helper">
+                  <svg
+                    aria-hidden="true"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
+                    <circle cx="12" cy="12" r="9" />
+                    <path d="M12 10v6" />
+                    <path d="M12 7h.01" />
+                  </svg>
+
+                  <span>
+                    Technician locations track stock assigned to an
+                    individual field technician.
+                  </span>
+                </div>
               </div>
             )}
           </div>
-
-          {location && (
-            <div className="flex items-center gap-2 text-sm text-[#647086]">
-              <span>Current status:</span>
-              <Badge
-                tone={location.status === "active" ? "success" : "neutral"}
-              >
-                {location.status}
-              </Badge>
-            </div>
-          )}
-
-          <div className="flex gap-3">
-            <Button type="submit">
-              {isEdit ? "Save Changes" : "Create Stock Location"}
-            </Button>
-
-            <Button
-              type="button"
-              variant="secondary"
-              onClick={() => router.push("/inventory/stock-locations")}
-            >
-              Cancel
-            </Button>
-          </div>
         </form>
-      </Panel>
+      </section>
     </div>
   );
+}
+
+function FormControl({
+  label,
+  required = false,
+  error,
+  children,
+}: {
+  label: string;
+  required?: boolean;
+  error?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="stock-location-form-field">
+      <label>
+        {label}
+        {required && (
+          <span className="stock-location-form-required"> *</span>
+        )}
+      </label>
+
+      {children}
+
+      {error && (
+        <p className="stock-location-form-field-error">
+          {error}
+        </p>
+      )}
+    </div>
+  );
+}
+
+function getControlClassName(error?: string) {
+  return error
+    ? "stock-location-form-control stock-location-form-control-error"
+    : "stock-location-form-control";
 }

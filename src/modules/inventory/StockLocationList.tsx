@@ -4,12 +4,11 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 
 import PageHeader from "@/components/ui/PageHeader";
-import SearchInput from "@/components/ui/SearchInput";
-import { Badge, Button, Panel } from "@/components/ui/design-system";
+import { Button } from "@/components/ui/design-system";
+
 import { getSites } from "@/modules/assets/service";
-import {
-  getStockLocations,
-} from "@/modules/inventory/service";
+import { getStockLocations } from "@/modules/inventory/service";
+
 import type { StockLocation } from "@/modules/inventory/types";
 import type { Site } from "@/modules/assets/types";
 
@@ -48,32 +47,52 @@ export default function StockLocationList() {
   }, [locations, sites, search, type, status]);
 
   return (
-    <div className="space-y-6">
+    <div className="stock-locations-page">
       <PageHeader
+        eyebrow="Inventory"
         title="Stock Locations"
         description="Manage warehouses and technician stock locations."
         action={
           <Link href="/inventory/stock-locations/new">
-            <Button>Create Stock Location</Button>
+            <Button>
+              <span aria-hidden="true">+</span>
+              Create Stock Location
+            </Button>
           </Link>
         }
       />
 
-      <Panel
-        title="Filters"
-        description="Search and filter stock locations."
-      >
-        <div className="grid gap-4 md:grid-cols-3">
-          <SearchInput
-            value={search}
-            onChange={(event) => setSearch(event.target.value)}
-            placeholder="Search by name, code, site, or technician..."
-          />
+      <section className="stock-locations-filters">
+        
+
+        <div className="stock-locations-filter-controls">
+          <div className="stock-locations-search">
+            <svg
+              aria-hidden="true"
+              className="stock-locations-search-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <circle cx="11" cy="11" r="7" />
+              <path d="m20 20-3.5-3.5" />
+            </svg>
+
+            <input
+              type="search"
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              placeholder="Search by name, code, site, or technician..."
+              aria-label="Search stock locations"
+            />
+          </div>
 
           <select
             value={type}
             onChange={(event) => setType(event.target.value)}
-            className="input"
+            className="stock-locations-filter-select"
+            aria-label="Filter by type"
           >
             <option value="">All Types</option>
             <option value="warehouse">Warehouse</option>
@@ -83,48 +102,32 @@ export default function StockLocationList() {
           <select
             value={status}
             onChange={(event) => setStatus(event.target.value)}
-            className="input"
+            className="stock-locations-filter-select"
+            aria-label="Filter by status"
           >
             <option value="">All Statuses</option>
             <option value="active">Active</option>
             <option value="inactive">Inactive</option>
           </select>
         </div>
-      </Panel>
+      </section>
 
-      <Panel
-        title="Stock Locations"
-        description={`${filteredLocations.length} location${
-          filteredLocations.length === 1 ? "" : "s"
-        } found.`}
-      >
-        {filteredLocations.length === 0 ? (
-          <div className="py-8 text-center text-sm text-slate-500">
-            No stock locations match the current filters.
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
+      <section className="stock-locations-table-card">
+        <div className="stock-locations-table-wrapper">
+          {filteredLocations.length === 0 ? (
+            <div className="stock-locations-empty">
+              No stock locations match the current filters.
+            </div>
+          ) : (
+            <table className="stock-locations-table">
               <thead>
-                <tr className="border-b border-slate-200">
-                  <th className="px-3 py-3 font-medium text-slate-600">
-                    Location
-                  </th>
-                  <th className="px-3 py-3 font-medium text-slate-600">
-                    Code
-                  </th>
-                  <th className="px-3 py-3 font-medium text-slate-600">
-                    Type
-                  </th>
-                  <th className="px-3 py-3 font-medium text-slate-600">
-                    Site / Technician
-                  </th>
-                  <th className="px-3 py-3 font-medium text-slate-600">
-                    Status
-                  </th>
-                  <th className="px-3 py-3 font-medium text-slate-600">
-                    Actions
-                  </th>
+                <tr>
+                  <th>Location</th>
+                  <th>Code</th>
+                  <th>Type</th>
+                  <th>Site / Technician</th>
+                  <th>Status</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
 
@@ -135,56 +138,94 @@ export default function StockLocationList() {
                     : undefined;
 
                   return (
-                    <tr
-                      key={location.id}
-                      className="border-b border-slate-100"
-                    >
-                      <td className="px-3 py-3 font-medium text-slate-900">
-                        {location.name}
+                    <tr key={location.id}>
+                      <td>
+                        <Link
+                          href={`/inventory/stock-locations/${location.id}`}
+                          className="stock-location-name"
+                        >
+                          {location.name}
+                        </Link>
                       </td>
 
-                      <td className="px-3 py-3 text-slate-600">
-                        {location.code}
+                      <td>
+                        <span className="stock-location-code">
+                          {location.code}
+                        </span>
                       </td>
 
-                      <td className="px-3 py-3 text-slate-600">
-                        {location.type === "warehouse"
-                          ? "Warehouse"
-                          : "Technician"}
-                      </td>
-
-                      <td className="px-3 py-3 text-slate-600">
-                        {location.type === "warehouse"
-                          ? site?.name ?? "—"
-                          : location.technicianName ?? "—"}
-                      </td>
-
-                      <td className="px-3 py-3">
-                        <Badge
-                          tone={
-                            location.status === "active"
-                              ? "success"
-                              : "neutral"
+                      <td>
+                        <span
+                          className={
+                            location.type === "warehouse"
+                              ? "stock-location-type stock-location-type-warehouse"
+                              : "stock-location-type stock-location-type-technician"
                           }
                         >
-                          {location.status}
-                        </Badge>
+                          {location.type === "warehouse"
+                            ? "Warehouse"
+                            : "Technician"}
+                        </span>
                       </td>
 
-                      <td className="px-3 py-3">
-                        <div className="flex gap-3">
+                      <td>
+                        <span className="stock-location-site">
+                          {location.type === "warehouse"
+                            ? site?.name ?? "—"
+                            : location.technicianName ?? "—"}
+                        </span>
+                      </td>
+
+                      <td>
+                        <span
+                          className={
+                            location.status === "active"
+                              ? "stock-location-status stock-location-status-active"
+                              : "stock-location-status stock-location-status-inactive"
+                          }
+                        >
+                          {location.status === "active"
+                            ? "Active"
+                            : "Inactive"}
+                        </span>
+                      </td>
+
+                      <td>
+                        <div className="stock-location-actions">
                           <Link
                             href={`/inventory/stock-locations/${location.id}`}
-                            className="text-sm font-medium text-blue-600 hover:underline"
+                            className="stock-location-action"
+                            aria-label={`View ${location.name}`}
+                            title="View"
                           >
-                            View
+                            <svg
+                              aria-hidden="true"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                            >
+                              <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z" />
+                              <circle cx="12" cy="12" r="2.5" />
+                            </svg>
                           </Link>
 
                           <Link
                             href={`/inventory/stock-locations/${location.id}/edit`}
-                            className="text-sm font-medium text-blue-600 hover:underline"
+                            className="stock-location-action"
+                            aria-label={`Edit ${location.name}`}
+                            title="Edit"
                           >
-                            Edit
+                            <svg
+                              aria-hidden="true"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                            >
+                           
+                              <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z" />
+                            </svg>
                           </Link>
                         </div>
                       </td>
@@ -193,9 +234,9 @@ export default function StockLocationList() {
                 })}
               </tbody>
             </table>
-          </div>
-        )}
-      </Panel>
+          )}
+        </div>
+      </section>
     </div>
   );
 }

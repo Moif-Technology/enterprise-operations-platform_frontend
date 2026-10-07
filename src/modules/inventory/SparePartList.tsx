@@ -1,14 +1,12 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import PageHeader from "@/components/ui/PageHeader";
-import FilterBar from "@/components/ui/FilterBar";
-import SearchInput from "@/components/ui/SearchInput";
 import FormField from "@/components/ui/FormField";
-import { Badge, Button, Panel } from "@/components/ui/design-system";
+import { Button } from "@/components/ui/design-system";
 import {
   EmptyState,
   ErrorState,
@@ -27,14 +25,6 @@ type ListStatus = "loading" | "ready" | "error";
 
 const ITEM_STATUSES: InventoryRecordStatus[] = ["active", "inactive"];
 
-const TABLE_COLUMNS = "1fr 1.4fr 1fr 0.9fr 0.8fr 0.8fr 0.9fr 0.8fr";
-
-function statusTone(
-  status: InventoryRecordStatus,
-): "neutral" | "success" | "warning" | "danger" | "info" {
-  return status === "active" ? "success" : "neutral";
-}
-
 function formatStatusLabel(status: InventoryRecordStatus): string {
   return status.charAt(0).toUpperCase() + status.slice(1);
 }
@@ -45,10 +35,11 @@ export default function SparePartList() {
   const [listStatus, setListStatus] = useState<ListStatus>("loading");
   const [errorMessage, setErrorMessage] = useState<string | undefined>();
   const [items, setItems] = useState<SparePartItem[]>([]);
+
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("all");
   const [status, setStatus] = useState("all");
-  const [lowStockOnly, setLowStockOnly] = useState(false);
+  const [stockLevel, setStockLevel] = useState("all");
 
   const loadSpareParts = () => {
     setListStatus("loading");
@@ -65,7 +56,6 @@ export default function SparePartList() {
           ? error.message
           : "The spare parts list could not be loaded.",
       );
-
     }
   };
 
@@ -78,9 +68,7 @@ export default function SparePartList() {
   }, []);
 
   const categories = useMemo(() => {
-    return Array.from(
-      new Set(items.map((item) => item.category)),
-    ).sort();
+    return Array.from(new Set(items.map((item) => item.category))).sort();
   }, [items]);
 
   const stockSummaryByItemId = useMemo(() => {
@@ -105,8 +93,13 @@ export default function SparePartList() {
       }
 
       const stockSummary = stockSummaryByItemId.get(item.id);
+      const quantity = stockSummary?.totalQuantity ?? 0;
 
-      if (lowStockOnly && !stockSummary?.isLowStock) {
+      if (stockLevel === "low" && !stockSummary?.isLowStock) {
+        return false;
+      }
+
+      if (stockLevel === "out" && quantity > 0) {
         return false;
       }
 
@@ -127,7 +120,7 @@ export default function SparePartList() {
     search,
     category,
     status,
-    lowStockOnly,
+    stockLevel,
     stockSummaryByItemId,
   ]);
 
@@ -135,49 +128,53 @@ export default function SparePartList() {
     setSearch("");
     setCategory("all");
     setStatus("all");
-    setLowStockOnly(false);
-  };
-
-  const openItem = (itemId: string) => {
-    router.push(`/inventory/spare-parts/${itemId}`);
+    setStockLevel("all");
   };
 
   return (
-    <section>
+    <section className="spare-parts-page">
       <PageHeader
         eyebrow="Inventory"
-        title="Spare parts"
+        title="Spare Parts"
         description="Manage the spare part item master and monitor current stock levels."
         action={
-          <Button onClick={() => router.push("/inventory/spare-parts/new")}>
+          <Button
+            onClick={() => router.push("/inventory/spare-parts/new")}
+          >
+            <span aria-hidden="true">+</span>
             Add Spare Part
           </Button>
         }
       />
 
-      <Panel
-        title="Spare parts"
-        description="Manage the spare part item master and monitor current stock levels."
-      >
-        <FilterBar
-          action={
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={clearFilters}
-            >
-              Clear filters
-            </Button>
-          }
-        >
-          <SearchInput
-            id="spare-part-search"
-            label="Search"
-            placeholder="Search name, code, category, or manufacturer..."
-            value={search}
-            onChange={(event) => setSearch(event.target.value)}
-            aria-label="Search spare parts by name, code, category, or manufacturer"
-          />
+      <section className="spare-parts-filters">
+        <div className="spare-parts-filter-grid">
+          <div className="spare-parts-search">
+            <label htmlFor="spare-part-search">Search</label>
+
+            <div className="spare-parts-search-wrapper">
+              <svg
+                aria-hidden="true"
+                className="spare-parts-search-icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <circle cx="11" cy="11" r="7" />
+                <path d="m20 20-3.5-3.5" />
+              </svg>
+
+              <input
+                id="spare-part-search"
+                type="search"
+                placeholder="Search name, code, category..."
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                aria-label="Search spare parts"
+              />
+            </div>
+          </div>
 
           <FormField
             label="Category"
@@ -189,6 +186,7 @@ export default function SparePartList() {
             }}
           >
             <option value="all">All categories</option>
+
             {categories.map((item) => (
               <option key={item} value={item}>
                 {item}
@@ -206,6 +204,7 @@ export default function SparePartList() {
             }}
           >
             <option value="all">All statuses</option>
+
             {ITEM_STATUSES.map((item) => (
               <option key={item} value={item}>
                 {formatStatusLabel(item)}
@@ -214,147 +213,201 @@ export default function SparePartList() {
           </FormField>
 
           <FormField
-            label="Stock"
+            label="Stock Level"
             name="spare-part-filter-stock"
             type="select"
             selectProps={{
-              value: lowStockOnly ? "low" : "all",
-              onChange: (event) =>
-                setLowStockOnly(event.target.value === "low"),
+              value: stockLevel,
+              onChange: (event) => setStockLevel(event.target.value),
             }}
           >
             <option value="all">All stock levels</option>
-            <option value="low">Low stock only</option>
+            <option value="low">Low stock</option>
+            <option value="out">Out of stock</option>
           </FormField>
-        </FilterBar>
 
-        <div style={{ marginTop: 16 }}>
-          {listStatus === "loading" && (
-            <LoadingState message="Loading spare parts..." />
-          )}
-
-          {listStatus === "error" && (
-            <ErrorState
-              title="Unable to load spare parts"
-              message={
-                errorMessage ??
-                "The sample spare parts data could not be loaded."
-              }
-              onRetry={loadSpareParts}
-            />
-          )}
-
-          {listStatus === "ready" && items.length === 0 && (
-            <EmptyState
-              title="No spare parts yet"
-              description="Add the first spare part to start the item master."
-              actionLabel="Add Spare Part"
-              onAction={() =>
-                router.push("/inventory/spare-parts/new")
-              }
-            />
-          )}
-
-          {listStatus === "ready" &&
-            items.length > 0 &&
-            filteredItems.length === 0 && (
-              <EmptyState
-                title="No matching spare parts"
-                description="No spare parts match the current search and filters."
-                actionLabel="Clear filters"
-                onAction={clearFilters}
-              />
-            )}
-
-          {listStatus === "ready" && filteredItems.length > 0 && (
-            <div
-              className="table-shell"
-              style={{ overflowX: "auto" }}
-            >
-              <div
-                className="table-head"
-                style={{
-                  gridTemplateColumns: TABLE_COLUMNS,
-                  minWidth: 900,
-                }}
-              >
-                <span>Part code</span>
-                <span>Name</span>
-                <span>Category</span>
-                <span>Unit</span>
-                <span>On hand</span>
-                <span>Reorder level</span>
-                <span>Status</span>
-                <span>Actions</span>
-              </div>
-
-              {filteredItems.map((item) => {
-                const stockSummary = stockSummaryByItemId.get(item.id);
-
-                return (
-                  <div
-                    key={item.id}
-                    className="table-row"
-                    role="link"
-                    tabIndex={0}
-                    style={{
-                      gridTemplateColumns: TABLE_COLUMNS,
-                      minWidth: 900,
-                      cursor: "pointer",
-                    }}
-                    onClick={() => openItem(item.id)}
-                    onKeyDown={(event) => {
-                      if (
-                        event.key === "Enter" ||
-                        event.key === " "
-                      ) {
-                        event.preventDefault();
-                        openItem(item.id);
-                      }
-                    }}
-                    aria-label={`View details for ${item.name}`}
-                  >
-                    <span>{item.partCode}</span>
-                    <span>{item.name}</span>
-                    <span>{item.category}</span>
-                    <span>{item.unitOfMeasure}</span>
-
-                    <span>
-                      {stockSummary?.totalQuantity ?? 0}
-                      {stockSummary?.isOutOfStock && (
-                        <span style={{ marginLeft: 6 }}>
-                          <Badge tone="danger">Out</Badge>
-                        </span>
-                      )}
-                    </span>
-
-                    <span>{item.reorderLevel}</span>
-
-                    <span>
-                      <Badge tone={statusTone(item.status)}>
-                        {formatStatusLabel(item.status)}
-                      </Badge>
-                    </span>
-
-                    <span
-                      onClick={(event) => event.stopPropagation()}
-                      onKeyDown={(event) => event.stopPropagation()}
-                    >
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => openItem(item.id)}
-                      >
-                        Details
-                      </Button>
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-          )}
+          <button
+            type="button"
+            className="spare-parts-clear-button"
+            onClick={clearFilters}
+          >
+            Clear Filters
+          </button>
         </div>
-      </Panel>
+      </section>
+
+      {listStatus === "loading" && (
+        <LoadingState message="Loading spare parts..." />
+      )}
+
+      {listStatus === "error" && (
+        <ErrorState
+          title="Unable to load spare parts"
+          message={
+            errorMessage ??
+            "The sample spare parts data could not be loaded."
+          }
+          onRetry={loadSpareParts}
+        />
+      )}
+
+      {listStatus === "ready" && items.length === 0 && (
+        <EmptyState
+          title="No spare parts yet"
+          description="Add the first spare part to start the item master."
+          actionLabel="Add Spare Part"
+          onAction={() =>
+            router.push("/inventory/spare-parts/new")
+          }
+        />
+      )}
+
+      {listStatus === "ready" &&
+        items.length > 0 &&
+        filteredItems.length === 0 && (
+          <EmptyState
+            title="No matching spare parts"
+            description="No spare parts match the current search and filters."
+            actionLabel="Clear filters"
+            onAction={clearFilters}
+          />
+        )}
+
+      {listStatus === "ready" && filteredItems.length > 0 && (
+        <section className="spare-parts-table-card">
+          <div className="spare-parts-table-wrapper">
+            <table className="spare-parts-table">
+              <thead>
+                <tr>
+                  <th>Part Code</th>
+                  <th>Name</th>
+                  <th>Category</th>
+                  <th>Unit</th>
+                  <th>On Hand</th>
+                  <th>Reorder Level</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {filteredItems.map((item) => {
+                  const stockSummary =
+                    stockSummaryByItemId.get(item.id);
+
+                  const quantity =
+                    stockSummary?.totalQuantity ?? 0;
+
+                  const isOutOfStock = quantity <= 0;
+
+                  return (
+                    <tr key={item.id}>
+                      <td>
+                        <span className="spare-parts-code">
+                          {item.partCode}
+                        </span>
+                      </td>
+
+                      <td>
+                        <Link
+                          href={`/inventory/spare-parts/${item.id}`}
+                          className="spare-parts-name"
+                        >
+                          {item.name}
+                        </Link>
+                      </td>
+
+                      <td>
+                        <span className="spare-parts-category">
+                          {item.category}
+                        </span>
+                      </td>
+
+                      <td>
+                        <span className="spare-parts-unit">
+                          {item.unitOfMeasure}
+                        </span>
+                      </td>
+
+                      <td>
+                        <div className="spare-parts-stock">
+                          <span className="spare-parts-quantity">
+                            {quantity}
+                          </span>
+
+                          {isOutOfStock && (
+                            <span className="spare-parts-out-badge">
+                              Out
+                            </span>
+                          )}
+                        </div>
+                      </td>
+
+                      <td>
+                        <span className="spare-parts-reorder">
+                          {item.reorderLevel}
+                        </span>
+                      </td>
+
+                      <td>
+                        <span
+                          className={
+                            item.status === "active"
+                              ? "spare-parts-status spare-parts-status-active"
+                              : "spare-parts-status spare-parts-status-inactive"
+                          }
+                        >
+                          {formatStatusLabel(item.status)}
+                        </span>
+                      </td>
+
+                      <td>
+                        <div className="spare-parts-actions">
+                          <Link
+                            href={`/inventory/spare-parts/${item.id}`}
+                            className="spare-parts-icon-button"
+                            aria-label={`View ${item.name}`}
+                            title="View"
+                          >
+                            <svg
+                              aria-hidden="true"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="1.8"
+                            >
+                              <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z" />
+                              <circle cx="12" cy="12" r="2.5" />
+                            </svg>
+                          </Link>
+
+                          <Link
+                            href={`/inventory/spare-parts/${item.id}/edit`}
+                            className="spare-parts-icon-button"
+                            aria-label={`Edit ${item.name}`}
+                            title="Edit"
+                          >
+                            <svg
+                              aria-hidden="true"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="1.8"
+                            >
+                            
+                              <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4L16.5 3.5Z" />
+                            </svg>
+                          </Link>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      )}
     </section>
   );
 }

@@ -1,17 +1,18 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-
 import Link from "next/link";
 
 import PageHeader from "@/components/ui/PageHeader";
-import FormField from "@/components/ui/FormField";
-import { Button, Panel } from "@/components/ui/design-system";
+import { Button } from "@/components/ui/design-system";
+import { Panel } from "@/components/ui/design-system";
+
 import {
   getSpareParts,
   getStockLocations,
   saveSparePart,
 } from "@/modules/inventory/service";
+
 import type {
   InventoryRecordStatus,
   SparePartItem,
@@ -36,6 +37,8 @@ type FormValues = {
   notes: string;
 };
 
+type FormErrors = Partial<Record<keyof FormValues | "form", string>>;
+
 const categories = [
   "HVAC",
   "Electrical",
@@ -52,6 +55,7 @@ export default function SparePartForm({
   item,
 }: SparePartFormProps) {
   const existingItems = getSpareParts();
+
   const warehouses = getStockLocations().filter(
     (location) => location.type === "warehouse",
   );
@@ -70,12 +74,12 @@ export default function SparePartForm({
     notes: item?.notes ?? "",
   });
 
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [errors, setErrors] = useState<FormErrors>({});
   const [success, setSuccess] = useState(false);
 
-  const updateValue = (
-    field: keyof FormValues,
-    value: string,
+  const updateValue = <K extends keyof FormValues>(
+    field: K,
+    value: FormValues[K],
   ) => {
     setValues((current) => ({
       ...current,
@@ -85,16 +89,17 @@ export default function SparePartForm({
     setErrors((current) => ({
       ...current,
       [field]: "",
+      form: "",
     }));
 
     setSuccess(false);
   };
 
   const validate = () => {
-    const nextErrors: Record<string, string> = {};
+    const nextErrors: FormErrors = {};
 
     if (!values.partCode.trim()) {
-      nextErrors.partCode = "Part code is required.";
+      nextErrors.partCode = "Field is required.";
     } else {
       const duplicate = existingItems.some(
         (existingItem) =>
@@ -104,44 +109,42 @@ export default function SparePartForm({
       );
 
       if (duplicate) {
-        nextErrors.partCode =
-          "This part code is already in use.";
+        nextErrors.partCode = "This part code is already in use.";
       }
     }
 
     if (!values.name.trim()) {
-      nextErrors.name = "Part name is required.";
+      nextErrors.name = "Field is required.";
     }
 
     if (!values.category) {
-      nextErrors.category = "Category is required.";
+      nextErrors.category = "Field is required.";
     }
 
     if (!values.unitOfMeasure.trim()) {
-      nextErrors.unitOfMeasure =
-        "Unit of measure is required.";
+      nextErrors.unitOfMeasure = "Field is required.";
+    }
+
+    if (!values.status) {
+      nextErrors.status = "Field is required.";
     }
 
     if (!values.reorderLevel.trim()) {
-      nextErrors.reorderLevel =
-        "Reorder level is required.";
+      nextErrors.reorderLevel = "Field is required.";
     } else {
       const reorderLevel = Number(values.reorderLevel);
 
       if (!Number.isFinite(reorderLevel)) {
-        nextErrors.reorderLevel =
-          "Reorder level must be a valid number.";
+        nextErrors.reorderLevel = "Reorder level must be a valid number.";
       } else if (reorderLevel < 0) {
-        nextErrors.reorderLevel =
-          "Reorder level cannot be negative.";
+        nextErrors.reorderLevel = "Reorder level cannot be negative.";
       }
     }
 
     if (
       values.preferredWarehouseId &&
       !warehouses.some(
-        (warehouse) =>
-          warehouse.id === values.preferredWarehouseId,
+        (warehouse) => warehouse.id === values.preferredWarehouseId,
       )
     ) {
       nextErrors.preferredWarehouseId =
@@ -153,9 +156,7 @@ export default function SparePartForm({
     return Object.keys(nextErrors).length === 0;
   };
 
-  const handleSubmit = (
-    event: FormEvent<HTMLFormElement>,
-  ) => {
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     if (!validate()) {
@@ -170,12 +171,10 @@ export default function SparePartForm({
         name: values.name.trim(),
         category: values.category,
         unitOfMeasure: values.unitOfMeasure.trim(),
-        manufacturer:
-          values.manufacturer.trim() || undefined,
+        manufacturer: values.manufacturer.trim() || undefined,
         manufacturerPartNumber:
           values.manufacturerPartNumber.trim() || undefined,
-        description:
-          values.description.trim() || undefined,
+        description: values.description.trim() || undefined,
         status: values.status,
         reorderLevel: Number(values.reorderLevel),
         preferredWarehouseId:
@@ -184,6 +183,7 @@ export default function SparePartForm({
       };
 
       saveSparePart(savedItem);
+
       setSuccess(true);
       setErrors({});
     } catch (error) {
@@ -198,282 +198,307 @@ export default function SparePartForm({
   };
 
   return (
-    <main className="w-full max-w-full">
-      <div className="w-full max-w-full space-y-6">
-        <PageHeader
-          title={
-            mode === "edit"
-              ? "Edit Spare Part"
-              : "Add Spare Part"
-          }
-          description={
-            mode === "edit"
-              ? "Update the spare part item master details."
-              : "Create a spare part item for inventory management."
-          }
-          action={
+    <main className="spare-part-form-page">
+      <PageHeader
+        eyebrow="Inventory"
+        title={mode === "edit" ? "Edit Spare Part" : "Add Spare Part"}
+        description={
+          mode === "edit"
+            ? "Update the spare part item master details."
+            : "Create a spare part item for inventory management."
+        }
+        action={
+          <div className="spare-part-form-header-actions">
             <Link href="/inventory/spare-parts">
-              <Button variant="secondary">Cancel</Button>
+              <Button variant="secondary" type="button">
+                Cancel
+              </Button>
             </Link>
-          }
-        />
 
-        {success && (
-          <Panel title="Saved successfully">
-            <p className="text-sm text-[#162033]">
-              The spare part has been saved successfully.
-            </p>
+            <Button type="submit" form="spare-part-form">
+              {mode === "edit" ? "Save Changes" : "Save Spare Part"}
+            </Button>
+          </div>
+        }
+      />
 
-            <div className="mt-4">
-              <Link href="/inventory/spare-parts">
-                <Button>Back to Spare Parts</Button>
-              </Link>
+      {success && (
+        <div className="spare-part-form-message spare-part-form-success">
+          <strong>Saved successfully</strong>
+          <span>The spare part has been saved successfully.</span>
+          <Link href="/inventory/spare-parts">
+            Back to Spare Parts
+          </Link>
+        </div>
+      )}
+
+      {errors.form && (
+        <div className="spare-part-form-message spare-part-form-error">
+          <strong>Unable to save</strong>
+          <span>{errors.form}</span>
+        </div>
+      )}
+
+      <form
+        id="spare-part-form"
+        onSubmit={handleSubmit}
+        className="spare-part-form"
+        noValidate
+      >
+        <div className="spare-part-form-grid">
+          {/* Card 1 */}
+          <section className="spare-part-form-card">
+            <div className="spare-part-form-card-header">
+              <h3>Part Details</h3>
             </div>
-          </Panel>
-        )}
 
-        {errors.form && (
-          <Panel title="Unable to save">
-            <p className="text-sm text-[#b91c1c]">
-              {errors.form}
-            </p>
-          </Panel>
-        )}
-
-        <Panel title="Spare part information">
-          <form
-            onSubmit={handleSubmit}
-            className="space-y-6"
-          >
-            <div className="grid gap-5 md:grid-cols-2">
-              <FormField
-                label="Part code"
-                name="partCode"
+            <div className="spare-part-form-fields">
+              <FormControl
+                label="Part Code"
                 required
                 error={errors.partCode}
-                placeholder="e.g. SP-HVAC-FLT-001"
-                inputProps={{
-                  value: values.partCode,
-                  onChange: (event) =>
-                    updateValue(
-                      "partCode",
-                      event.target.value,
-                    ),
-                }}
-              />
+              >
+                <input
+                  type="text"
+                  placeholder="e.g. SP-HVAC-FLT-001"
+                  value={values.partCode}
+                  onChange={(event) =>
+                    updateValue("partCode", event.target.value)
+                  }
+                  className={getInputClassName(errors.partCode)}
+                />
+              </FormControl>
 
-              <FormField
-                label="Part name"
-                name="name"
+              <FormControl
+                label="Part Name"
                 required
                 error={errors.name}
-                placeholder="e.g. AHU Air Filter"
-                inputProps={{
-                  value: values.name,
-                  onChange: (event) =>
-                    updateValue(
-                      "name",
-                      event.target.value,
-                    ),
-                }}
-              />
+              >
+                <input
+                  type="text"
+                  placeholder="e.g. AHU Air Filter"
+                  value={values.name}
+                  onChange={(event) =>
+                    updateValue("name", event.target.value)
+                  }
+                  className={getInputClassName(errors.name)}
+                />
+              </FormControl>
 
-              <FormField
+              <FormControl
                 label="Category"
-                name="category"
-                type="select"
                 required
                 error={errors.category}
-                selectProps={{
-                  value: values.category,
-                  onChange: (event) =>
-                    updateValue(
-                      "category",
-                      event.target.value,
-                    ),
-                }}
               >
-                <option value="">
-                  Select category
-                </option>
+                <select
+                  value={values.category}
+                  onChange={(event) =>
+                    updateValue("category", event.target.value)
+                  }
+                  className={getInputClassName(errors.category)}
+                >
+                  <option value="">Select category</option>
 
-                {categories.map((category) => (
-                  <option
-                    key={category}
-                    value={category}
-                  >
-                    {category}
-                  </option>
-                ))}
-              </FormField>
+                  {categories.map((category) => (
+                    <option key={category} value={category}>
+                      {category}
+                    </option>
+                  ))}
+                </select>
+              </FormControl>
 
-              <FormField
-                label="Unit of measure"
-                name="unitOfMeasure"
+              <FormControl
+                label="Unit of Measure"
                 required
                 error={errors.unitOfMeasure}
-                placeholder="e.g. piece, litre, metre"
-                inputProps={{
-                  value: values.unitOfMeasure,
-                  onChange: (event) =>
-                    updateValue(
-                      "unitOfMeasure",
-                      event.target.value,
-                    ),
-                }}
-              />
+              >
+                <input
+                  type="text"
+                  placeholder="e.g. piece, litre, metre"
+                  value={values.unitOfMeasure}
+                  onChange={(event) =>
+                    updateValue("unitOfMeasure", event.target.value)
+                  }
+                  className={getInputClassName(errors.unitOfMeasure)}
+                />
+              </FormControl>
 
-              <FormField
+              <FormControl
                 label="Status"
-                name="status"
-                type="select"
                 required
-                selectProps={{
-                  value: values.status,
-                  onChange: (event) =>
+                error={errors.status}
+              >
+                <select
+                  value={values.status}
+                  onChange={(event) =>
                     updateValue(
                       "status",
                       event.target.value as InventoryRecordStatus,
-                    ),
-                }}
-              >
-                {statuses.map((status) => (
-                  <option
-                    key={status}
-                    value={status}
-                  >
-                    {status === "active"
-                      ? "Active"
-                      : "Inactive"}
-                  </option>
-                ))}
-              </FormField>
+                    )
+                  }
+                  className={getInputClassName(errors.status)}
+                >
+                  {statuses.map((status) => (
+                    <option key={status} value={status}>
+                      {status === "active" ? "Active" : "Inactive"}
+                    </option>
+                  ))}
+                </select>
+              </FormControl>
 
-              <FormField
-                label="Reorder level"
-                name="reorderLevel"
+              <FormControl
+                label="Reorder Level"
                 required
                 error={errors.reorderLevel}
-                inputProps={{
-                  type: "number",
-                  min: 0,
-                  step: "any",
-                  value: values.reorderLevel,
-                  onChange: (event) =>
-                    updateValue(
-                      "reorderLevel",
-                      event.target.value,
-                    ),
-                }}
-              />
+              >
+                <input
+                  type="number"
+                  min="0"
+                  step="any"
+                  placeholder="0"
+                  value={values.reorderLevel}
+                  onChange={(event) =>
+                    updateValue("reorderLevel", event.target.value)
+                  }
+                  className={getInputClassName(errors.reorderLevel)}
+                />
+              </FormControl>
+            </div>
+          </section>
 
-              <FormField
-                label="Manufacturer"
-                name="manufacturer"
-                placeholder="Optional"
-                inputProps={{
-                  value: values.manufacturer,
-                  onChange: (event) =>
-                    updateValue(
-                      "manufacturer",
-                      event.target.value,
-                    ),
-                }}
-              />
+          {/* Card 2 */}
+          <section className="spare-part-form-card">
+            <div className="spare-part-form-card-header">
+              <h3>Manufacturer &amp; Storage</h3>
+            </div>
 
-              <FormField
-                label="Manufacturer part number"
-                name="manufacturerPartNumber"
-                placeholder="Optional"
-                inputProps={{
-                  value:
-                    values.manufacturerPartNumber,
-                  onChange: (event) =>
+            <div className="spare-part-form-fields">
+              <FormControl label="Manufacturer">
+                <input
+                  type="text"
+                  placeholder="e.g. Carrier, Trane"
+                  value={values.manufacturer}
+                  onChange={(event) =>
+                    updateValue("manufacturer", event.target.value)
+                  }
+                  className={getInputClassName()}
+                />
+              </FormControl>
+
+              <FormControl label="Manufacturer Part Number">
+                <input
+                  type="text"
+                  placeholder="e.g. MPN-99401"
+                  value={values.manufacturerPartNumber}
+                  onChange={(event) =>
                     updateValue(
                       "manufacturerPartNumber",
                       event.target.value,
-                    ),
-                }}
-              />
+                    )
+                  }
+                  className={getInputClassName()}
+                />
+              </FormControl>
 
-              <FormField
-                label="Preferred warehouse"
-                name="preferredWarehouseId"
-                type="select"
+              <FormControl
+                label="Preferred Warehouse"
                 error={errors.preferredWarehouseId}
-                selectProps={{
-                  value: values.preferredWarehouseId,
-                  onChange: (event) =>
+              >
+                <select
+                  value={values.preferredWarehouseId}
+                  onChange={(event) =>
                     updateValue(
                       "preferredWarehouseId",
                       event.target.value,
-                    ),
-                }}
-              >
-                <option value="">
-                  No preferred warehouse
-                </option>
-
-                {warehouses.map((warehouse) => (
-                  <option
-                    key={warehouse.id}
-                    value={warehouse.id}
-                  >
-                    {warehouse.name}
-                  </option>
-                ))}
-              </FormField>
-            </div>
-
-            <FormField
-              label="Description"
-              name="description"
-              type="textarea"
-              placeholder="Optional description of the spare part"
-              textareaProps={{
-                value: values.description,
-                onChange: (event) =>
-                  updateValue(
-                    "description",
-                    event.target.value,
-                  ),
-              }}
-            />
-
-            <FormField
-              label="Notes"
-              name="notes"
-              type="textarea"
-              placeholder="Optional notes about this spare part"
-              textareaProps={{
-                value: values.notes,
-                onChange: (event) =>
-                  updateValue(
-                    "notes",
-                    event.target.value,
-                  ),
-              }}
-            />
-
-            <div className="flex justify-end gap-3 border-t border-[#dfe4ea] pt-5">
-              <Link href="/inventory/spare-parts">
-                <Button
-                  variant="secondary"
-                  type="button"
+                    )
+                  }
+                  className={getInputClassName(
+                    errors.preferredWarehouseId,
+                  )}
                 >
-                  Cancel
-                </Button>
-              </Link>
+                  <option value="">Select preferred warehouse</option>
 
-              <Button type="submit">
-                {mode === "edit"
-                  ? "Save Changes"
-                  : "Add Spare Part"}
-              </Button>
+                  {warehouses.map((warehouse) => (
+                    <option key={warehouse.id} value={warehouse.id}>
+                      {warehouse.name}
+                    </option>
+                  ))}
+                </select>
+              </FormControl>
             </div>
-          </form>
-        </Panel>
-      </div>
+          </section>
+
+          {/* Card 3 */}
+          <section className="spare-part-form-card spare-part-form-card-wide">
+            <div className="spare-part-form-card-header">
+              <h3>Descriptions &amp; Notes</h3>
+            </div>
+
+            <div className="spare-part-form-fields">
+              <FormControl label="Description">
+                <textarea
+                  rows={3}
+                  placeholder="Optional description of the spare part"
+                  value={values.description}
+                  onChange={(event) =>
+                    updateValue("description", event.target.value)
+                  }
+                  className={getInputClassName()}
+                />
+              </FormControl>
+
+              <FormControl label="Notes">
+                <textarea
+                  rows={3}
+                  placeholder="Optional notes about this spare part"
+                  value={values.notes}
+                  onChange={(event) =>
+                    updateValue("notes", event.target.value)
+                  }
+                  className={getInputClassName()}
+                />
+              </FormControl>
+            </div>
+          </section>
+        </div>
+      </form>
     </main>
   );
+}
+
+function FormControl({
+  label,
+  required = false,
+  error,
+  children,
+}: {
+  label: string;
+  required?: boolean;
+  error?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="spare-part-form-field">
+      <label>
+        {label}
+        {required && (
+          <span className="spare-part-form-required"> *</span>
+        )}
+      </label>
+
+      {children}
+
+      {error && (
+        <p className="spare-part-form-field-error">
+          {error}
+        </p>
+      )}
+    </div>
+  );
+}
+
+function getInputClassName(error?: string) {
+  return error
+    ? "spare-part-form-control spare-part-form-control-error"
+    : "spare-part-form-control";
 }

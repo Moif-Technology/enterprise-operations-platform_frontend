@@ -1,10 +1,10 @@
 "use client";
 
-import { useMemo, useState } from "react";
 import Link from "next/link";
+import { useMemo, useState } from "react";
 
 import PageHeader from "@/components/ui/PageHeader";
-import { Panel } from "@/components/ui/design-system";
+
 import {
   getAllItemStockSummaries,
   getSpareParts,
@@ -45,14 +45,12 @@ export default function LowStockList() {
           return false;
         }
 
+        const searchValue = search.toLowerCase();
+
         const matchesSearch =
           !search ||
-          part.name
-            .toLowerCase()
-            .includes(search.toLowerCase()) ||
-          part.partCode
-            .toLowerCase()
-            .includes(search.toLowerCase());
+          part.name.toLowerCase().includes(searchValue) ||
+          part.partCode.toLowerCase().includes(searchValue);
 
         const matchesCategory =
           !category || part.category === category;
@@ -70,119 +68,210 @@ export default function LowStockList() {
   );
 
   return (
-    <div className="space-y-6">
+    <div className="low-stock-page">
       <PageHeader
         eyebrow="Inventory"
         title="Low Stock & Reorder"
         description="Review spare parts at or below their reorder level and see the quantity needed to reach that level."
       />
 
-      <Panel
-        title="Filters"
-        description="Filter low-stock items by part or category."
-      >
-        <div className="grid gap-5 md:grid-cols-2">
+      {/* KPI Summary */}
+      <div className="low-stock-kpi-grid">
+        <div className="low-stock-kpi-card">
           <div>
-            <label className="mb-2 block text-sm font-medium text-[#162033]">
-              Search
-            </label>
+            <p className="low-stock-kpi-label">
+              Out of Stock
+            </p>
+
+            <p className="low-stock-kpi-value low-stock-kpi-value-danger">
+              {outOfStockItems.length}
+            </p>
+
+            <p className="low-stock-kpi-subtext">
+              Items with zero total stock.
+            </p>
+          </div>
+
+          <div className="low-stock-kpi-icon low-stock-kpi-icon-danger">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              aria-hidden="true"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 9v4m0 4h.01M10.3 3.7 2.8 17a2 2 0 0 0 1.75 3h14.9a2 2 0 0 0 1.75-3L13.7 3.7a2 2 0 0 0-3.4 0Z"
+              />
+            </svg>
+          </div>
+        </div>
+
+        <div className="low-stock-kpi-card">
+          <div>
+            <p className="low-stock-kpi-label">
+              At or Below Reorder Level
+            </p>
+
+            <p className="low-stock-kpi-value low-stock-kpi-value-warning">
+              {reorderItems.length}
+            </p>
+
+            <p className="low-stock-kpi-subtext">
+              Items requiring stock attention.
+            </p>
+          </div>
+
+          <div className="low-stock-kpi-icon low-stock-kpi-icon-warning">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              aria-hidden="true"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 3v18m9-9H3"
+              />
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      {/* Filters */}
+      <section className="low-stock-filter-card">
+        <div className="low-stock-filter-header">
+          <h3>Filters</h3>
+
+          <p>
+            Filter low-stock items by part or category.
+          </p>
+        </div>
+
+        <div className="low-stock-filter-controls">
+          <div className="low-stock-search">
+            <svg
+              className="low-stock-search-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              aria-hidden="true"
+            >
+              <circle cx="11" cy="11" r="7" />
+              <path
+                strokeLinecap="round"
+                d="m20 20-4-4"
+              />
+            </svg>
 
             <input
+              type="search"
               value={search}
               onChange={(event) =>
                 setSearch(event.target.value)
               }
-              className="input w-full"
-              placeholder="Search part name or code"
+              placeholder="Search part name or code..."
+              aria-label="Search part name or code"
             />
           </div>
 
+          <select
+            value={category}
+            onChange={(event) =>
+              setCategory(event.target.value)
+            }
+            className="low-stock-category-select"
+            aria-label="Filter by category"
+          >
+            <option value="">All categories</option>
+
+            {categories.map((itemCategory) => (
+              <option
+                key={itemCategory}
+                value={itemCategory}
+              >
+                {itemCategory}
+              </option>
+            ))}
+          </select>
+        </div>
+      </section>
+
+      {/* Out of Stock */}
+      <section className="low-stock-table-card low-stock-table-card-critical">
+        <div className="low-stock-table-header low-stock-table-header-critical">
           <div>
-            <label className="mb-2 block text-sm font-medium text-[#162033]">
-              Category
-            </label>
+            <h3>
+              <span className="low-stock-critical-dot" />
+              Out of Stock
+            </h3>
 
-            <select
-              value={category}
-              onChange={(event) =>
-                setCategory(event.target.value)
-              }
-              className="input w-full"
-            >
-              <option value="">All categories</option>
-
-              {categories.map((itemCategory) => (
-                <option
-                  key={itemCategory}
-                  value={itemCategory}
-                >
-                  {itemCategory}
-                </option>
-              ))}
-            </select>
+            <p>
+              These items currently have zero total stock.
+            </p>
           </div>
-        </div>
-      </Panel>
 
-      <div className="grid gap-4 md:grid-cols-2">
-        <div className="rounded-lg border border-red-200 bg-red-50 p-5">
-          <p className="text-sm font-medium text-red-700">
-            Out of stock
-          </p>
-
-          <p className="mt-2 text-2xl font-semibold text-[#162033]">
+          <span className="low-stock-count-badge low-stock-count-badge-critical">
             {outOfStockItems.length}
-          </p>
-
-          <p className="mt-1 text-sm text-[#647086]">
-            Items with zero total stock.
-          </p>
+          </span>
         </div>
 
-        <div className="rounded-lg border border-amber-200 bg-amber-50 p-5">
-          <p className="text-sm font-medium text-amber-700">
-            At or below reorder level
-          </p>
-
-          <p className="mt-2 text-2xl font-semibold text-[#162033]">
-            {reorderItems.length}
-          </p>
-
-          <p className="mt-1 text-sm text-[#647086]">
-            Items requiring stock attention.
-          </p>
-        </div>
-      </div>
-
-      <Panel
-        title="Out of Stock"
-        description="These items currently have zero total stock."
-      >
         {outOfStockItems.length === 0 ? (
-          <div className="rounded-md border border-[#dfe4ea] bg-[#f6f7f9] px-6 py-8 text-center">
-            <p className="text-sm font-medium text-[#162033]">
+          <div className="low-stock-empty low-stock-empty-critical">
+            <p className="low-stock-empty-title">
               No items are out of stock.
+            </p>
+
+            <p className="low-stock-empty-description">
+              All spare parts currently have available
+              stock.
             </p>
           </div>
         ) : (
-          <StockTable items={outOfStockItems} />
+          <StockTable
+            items={outOfStockItems}
+            critical
+          />
         )}
-      </Panel>
+      </section>
 
-      <Panel
-        title="Reorder Required"
-        description="These items are above zero stock but at or below their reorder level."
-      >
+      {/* Reorder Required */}
+      <section className="low-stock-table-card">
+        <div className="low-stock-table-header">
+          <div>
+            <h3>Reorder Required</h3>
+
+            <p>
+              These items are above zero stock but at or
+              below their reorder level.
+            </p>
+          </div>
+
+          <span className="low-stock-count-badge">
+            {reorderItems.length}
+          </span>
+        </div>
+
         {reorderItems.length === 0 ? (
-          <div className="rounded-md border border-[#dfe4ea] bg-[#f6f7f9] px-6 py-8 text-center">
-            <p className="text-sm font-medium text-[#162033]">
+          <div className="low-stock-empty low-stock-empty-reorder">
+            <p className="low-stock-empty-title">
               No additional reorder attention is required.
+            </p>
+
+            <p className="low-stock-empty-description">
+              All other stock items are currently above
+              their reorder thresholds.
             </p>
           </div>
         ) : (
           <StockTable items={reorderItems} />
         )}
-      </Panel>
+      </section>
     </div>
   );
 }
@@ -196,88 +285,107 @@ type StockTableItem = {
 
 function StockTable({
   items,
+  critical = false,
 }: {
   items: StockTableItem[];
+  critical?: boolean;
 }) {
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full min-w-[850px] text-left">
+    <div className="low-stock-table-wrapper">
+      <table className="low-stock-table">
         <thead>
-          <tr className="border-b border-[#dfe4ea] text-sm text-[#647086]">
-            <th className="px-4 py-3 font-medium">
-              Part
-            </th>
-
-            <th className="px-4 py-3 font-medium">
-              Category
-            </th>
-
-            <th className="px-4 py-3 font-medium">
-              Current Stock
-            </th>
-
-            <th className="px-4 py-3 font-medium">
-              Reorder Level
-            </th>
-
-            <th className="px-4 py-3 font-medium">
-              Suggested Reorder
-            </th>
-
-            <th className="px-4 py-3 font-medium">
-              Status
-            </th>
+          <tr>
+            <th>Part</th>
+            <th>Category</th>
+            <th>Current Stock</th>
+            <th>Reorder Level</th>
+            <th>Suggested Reorder</th>
+            <th>Status</th>
+            <th>Actions</th>
           </tr>
         </thead>
 
         <tbody>
           {items.map(({ part, summary }) => (
-            <tr
-              key={part.id}
-              className="border-b border-[#eef1f4] last:border-b-0"
-            >
-              <td className="px-4 py-4">
-                <Link
-                  href={`/inventory/spare-parts/${part.id}`}
-                  className="text-sm font-medium text-[#0f766e] hover:underline"
-                >
-                  {part.name}
-                </Link>
+            <tr key={part.id}>
+              {/* Part */}
+              <td>
+                <div className="low-stock-part">
+                  <Link
+                    href={`/inventory/spare-parts/${part.id}`}
+                    className="low-stock-part-name"
+                  >
+                    {part.name}
+                  </Link>
 
-                <div className="text-xs text-[#647086]">
-                  {part.partCode}
+                  <span className="low-stock-part-code">
+                    {part.partCode}
+                  </span>
                 </div>
               </td>
 
-              <td className="px-4 py-4 text-sm text-[#647086]">
-                {part.category}
+              {/* Category */}
+              <td>
+                <span className="low-stock-category">
+                  {part.category}
+                </span>
               </td>
 
-              <td className="px-4 py-4 text-sm font-medium text-[#162033]">
-                {summary?.totalQuantity ?? 0}{" "}
-                {part.unitOfMeasure}
+              {/* Current Stock */}
+              <td>
+                <span
+                  className={
+                    critical
+                      ? "low-stock-current low-stock-current-critical"
+                      : "low-stock-current"
+                  }
+                >
+                  {summary?.totalQuantity ?? 0}{" "}
+                  {part.unitOfMeasure}
+                </span>
               </td>
 
-              <td className="px-4 py-4 text-sm text-[#647086]">
-                {summary?.reorderLevel ?? 0}{" "}
-                {part.unitOfMeasure}
+              {/* Reorder Level */}
+              <td>
+                <span className="low-stock-reorder-level">
+                  {summary?.reorderLevel ?? 0}{" "}
+                  {part.unitOfMeasure}
+                </span>
               </td>
 
-              <td className="px-4 py-4 text-sm font-medium text-[#162033]">
-                {summary?.reorderSuggestionQuantity ?? 0}{" "}
-                {part.unitOfMeasure}
+              {/* Suggested Reorder */}
+              <td>
+                <span className="low-stock-suggested">
+                  {summary?.reorderSuggestionQuantity ?? 0}{" "}
+                  {part.unitOfMeasure}
+                </span>
               </td>
 
-              <td className="px-4 py-4">
+              {/* Status */}
+              <td>
                 {summary?.isOutOfStock ? (
-                  <span className="inline-flex rounded-full border border-red-200 bg-red-50 px-2.5 py-1 text-xs font-medium text-red-700">
+                  <span className="low-stock-status low-stock-status-critical">
                     Out of stock
                   </span>
                 ) : (
-                  <span className="inline-flex rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-700">
+                  <span className="low-stock-status low-stock-status-warning">
                     Low stock
                   </span>
                 )}
+              </td>
+
+              {/* Actions */}
+              <td>
+                <button
+                  type="button"
+                  className="low-stock-reorder-button"
+                  onClick={() => {
+                    // Reorder workflow can be connected here
+                    // when procurement/reorder functionality is available.
+                  }}
+                >
+                  + Reorder
+                </button>
               </td>
             </tr>
           ))}

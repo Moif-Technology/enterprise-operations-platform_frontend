@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useParams } from "next/navigation";
 import { useMemo } from "react";
+import { useParams } from "next/navigation";
 
 import PageHeader from "@/components/ui/PageHeader";
-import { Badge, Button, Panel } from "@/components/ui/design-system";
+import { Badge, Button } from "@/components/ui/design-system";
+
 import { getSiteById } from "@/modules/assets/service";
 import {
   getSpareParts,
@@ -24,28 +25,26 @@ export default function StockLocationDetailPage() {
 
   if (!location) {
     return (
-      <main className="w-full max-w-full">
-        <div className="w-full max-w-full">
-          <PageHeader
-            title="Stock location not found"
-            description="The requested stock location does not exist."
-            action={
-              <Link href="/inventory/stock-locations">
-                <Button variant="secondary">
-                  Back to Stock Locations
-                </Button>
-              </Link>
-            }
-          />
+      <div className="stock-location-detail-page">
+        <PageHeader
+          eyebrow="Inventory / Stock Locations"
+          title="Stock location not found"
+          description="The requested stock location does not exist."
+          action={
+            <Link href="/inventory/stock-locations">
+              <Button variant="secondary">Back to Stock Locations</Button>
+            </Link>
+          }
+        />
 
-          <Panel title="Unknown record">
-            <p className="text-sm text-[#647086]">
-              The stock location may have been removed or the link may be
-              invalid.
-            </p>
-          </Panel>
-        </div>
-      </main>
+        <section className="stock-location-detail-card">
+          <h3>Unknown record</h3>
+          <p>
+            The stock location may have been removed or the link may be
+            invalid.
+          </p>
+        </section>
+      </div>
     );
   }
 
@@ -59,49 +58,148 @@ export default function StockLocationDetailPage() {
     (balance) => balance.locationId === location.id,
   );
 
+  const locationType =
+    location.type === "warehouse" ? "Warehouse" : "Technician";
+
+  const linkedSite =
+    location.type === "warehouse"
+      ? site?.name ?? "Unknown site"
+      : location.technicianName ?? "—";
+
   return (
-    <main className="w-full max-w-full">
-      <div className="w-full max-w-full space-y-6">
-        <PageHeader
-          eyebrow="Inventory"
-          title={location.name}
-          description={`${location.code} · ${
-            location.type === "warehouse"
-              ? "Warehouse"
-              : "Technician Stock"
-          }`}
-          action={
-            <div className="flex gap-3">
-              <Link href="/inventory/stock-locations">
-                <Button variant="secondary">Back</Button>
-              </Link>
-
-              <Link
-                href={`/inventory/stock-locations/${location.id}/edit`}
+    <div className="stock-location-detail-page">
+      <PageHeader
+        eyebrow="Inventory / Stock Locations"
+        title={location.name}
+        description={`Type: ${locationType} | ${
+          location.type === "warehouse"
+            ? `Linked Site: ${linkedSite}`
+            : `Technician: ${linkedSite}`
+        }`}
+        action={
+          <Link href={`/inventory/stock-locations/${location.id}/edit`}>
+            <Button>
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                aria-hidden="true"
               >
-                <Button>Edit Stock Location</Button>
-              </Link>
+                
+                <path
+                  d="M16.5 3.5a2.121 2.121 0 0 1 3 3L8 18l-4 1 1-4L16.5 3.5Z"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              Edit Stock Location
+            </Button>
+          </Link>
+        }
+      />
+
+      <div className="stock-location-detail-title-meta">
+        <Badge
+          tone={location.status === "active" ? "success" : "neutral"}
+        >
+          {location.status === "active" ? "Active" : "Inactive"}
+        </Badge>
+
+        <span className="stock-location-detail-code">
+          {location.code}
+        </span>
+      </div>
+
+      <div className="stock-location-detail-dashboard">
+        <main className="stock-location-detail-main">
+          <section className="stock-location-detail-card">
+            <div className="stock-location-detail-card-header">
+              <h3>Current Stock</h3>
+              <p>
+                Quantities are derived from opening balances and recorded
+                movements.
+              </p>
             </div>
-          }
-        />
 
-        <Panel title="Location information">
-          <div className="grid gap-5 md:grid-cols-2">
-            <div>
-              <p className="text-xs font-medium uppercase tracking-wide text-[#647086]">
-                Location code
-              </p>
-              <p className="mt-1 text-sm text-[#162033]">
-                {location.code}
-              </p>
+            {balances.length === 0 ? (
+              <div className="stock-location-detail-empty">
+                No stock has been recorded at this location.
+              </div>
+            ) : (
+              <div className="stock-location-detail-table-wrapper">
+                <table className="stock-location-detail-table">
+                  <thead>
+                    <tr>
+                      <th>Spare Part</th>
+                      <th>Part Code</th>
+                      <th>On Hand</th>
+                      <th>Damaged</th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    {balances.map((balance) => {
+                      const part = parts.find(
+                        (item) => item.id === balance.itemId,
+                      );
+
+                      return (
+                        <tr
+                          key={`${balance.itemId}-${balance.locationId}`}
+                        >
+                          <td>
+                            <Link
+                              href={`/inventory/spare-parts/${balance.itemId}`}
+                              className="stock-location-detail-part-link"
+                            >
+                              {part?.name ?? "Unknown spare part"}
+                            </Link>
+                          </td>
+
+                          <td>
+                            <span className="stock-location-detail-part-code">
+                              {part?.partCode ?? "—"}
+                            </span>
+                          </td>
+
+                          <td>
+                            <span className="stock-location-detail-on-hand">
+                              {balance.quantity}
+                            </span>
+                          </td>
+
+                          <td>
+                            <span className="stock-location-detail-damaged">
+                              {balance.damagedQuantity}
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </section>
+        </main>
+
+        <aside className="stock-location-detail-sidebar">
+          <section className="stock-location-detail-card">
+            <div className="stock-location-detail-card-header">
+              <h3>Location Overview</h3>
             </div>
 
-            <div>
-              <p className="text-xs font-medium uppercase tracking-wide text-[#647086]">
-                Status
-              </p>
+            <div className="stock-location-detail-fields">
+              <DetailField label="Location Code">
+                <span className="stock-location-detail-part-code">
+                  {location.code}
+                </span>
+              </DetailField>
 
-              <div className="mt-1">
+              <DetailField label="Status">
                 <Badge
                   tone={
                     location.status === "active"
@@ -113,97 +211,48 @@ export default function StockLocationDetailPage() {
                     ? "Active"
                     : "Inactive"}
                 </Badge>
-              </div>
-            </div>
+              </DetailField>
 
-            <div>
-              <p className="text-xs font-medium uppercase tracking-wide text-[#647086]">
-                Type
-              </p>
+              <DetailField label="Type">
+                <span
+                  className={`stock-location-detail-type-badge ${
+                    location.type === "warehouse"
+                      ? "stock-location-detail-type-warehouse"
+                      : "stock-location-detail-type-technician"
+                  }`}
+                >
+                  {locationType}
+                </span>
+              </DetailField>
 
-              <p className="mt-1 text-sm text-[#162033]">
-                {location.type === "warehouse"
-                  ? "Warehouse"
-                  : "Technician"}
-              </p>
-            </div>
-
-            <div>
-              <p className="text-xs font-medium uppercase tracking-wide text-[#647086]">
-                {location.type === "warehouse"
-                  ? "Linked site"
-                  : "Technician"}
-              </p>
-
-              <p className="mt-1 text-sm text-[#162033]">
-                {location.type === "warehouse"
-                  ? site?.name ?? "Unknown site"
-                  : location.technicianName ?? "—"}
-              </p>
-            </div>
-          </div>
-        </Panel>
-
-        <Panel
-          title="Current stock"
-          description="Quantities are derived from opening balances and recorded movements."
-        >
-          {balances.length === 0 ? (
-            <p className="text-sm text-[#647086]">
-              No stock has been recorded at this location.
-            </p>
-          ) : (
-            <div className="table-shell overflow-x-auto">
-              <div
-                className="table-head"
-                style={{
-                  gridTemplateColumns:
-                    "1.3fr 1fr 0.8fr 0.8fr",
-                  minWidth: 700,
-                }}
+              <DetailField
+                label={
+                  location.type === "warehouse"
+                    ? "Linked Site"
+                    : "Technician"
+                }
               >
-                <span>Spare part</span>
-                <span>Part code</span>
-                <span>On hand</span>
-                <span>Damaged</span>
-              </div>
-
-              {balances.map((balance) => {
-                const part = parts.find(
-                  (item) => item.id === balance.itemId,
-                );
-
-                return (
-                  <div
-                    key={`${balance.itemId}-${balance.locationId}`}
-                    className="table-row"
-                    style={{
-                      gridTemplateColumns:
-                        "1.3fr 1fr 0.8fr 0.8fr",
-                      minWidth: 700,
-                    }}
-                  >
-                    <Link
-                      href={`/inventory/spare-parts/${balance.itemId}`}
-                      className="font-medium text-[#0f766e] hover:underline"
-                    >
-                      {part?.name ?? "Unknown spare part"}
-                    </Link>
-
-                    <span>
-                      {part?.partCode ?? "—"}
-                    </span>
-
-                    <span>{balance.quantity}</span>
-
-                    <span>{balance.damagedQuantity}</span>
-                  </div>
-                );
-              })}
+                {linkedSite}
+              </DetailField>
             </div>
-          )}
-        </Panel>
+          </section>
+        </aside>
       </div>
-    </main>
+    </div>
+  );
+}
+
+function DetailField({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="stock-location-detail-field">
+      <span className="stock-location-detail-label">{label}</span>
+      <div className="stock-location-detail-value">{children}</div>
+    </div>
   );
 }

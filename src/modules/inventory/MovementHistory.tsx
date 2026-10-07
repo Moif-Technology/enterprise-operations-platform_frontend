@@ -1,14 +1,16 @@
 "use client";
+
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
 import PageHeader from "@/components/ui/PageHeader";
-import { EmptyState, Panel } from "@/components/ui/design-system";
+
 import {
   getMovements,
   getSpareParts,
   getStockLocations,
 } from "@/modules/inventory/service";
+
 import type { StockMovementType } from "@/modules/inventory/types";
 
 export default function MovementHistory() {
@@ -24,39 +26,41 @@ export default function MovementHistory() {
   const [toDate, setToDate] = useState("");
 
   const filteredMovements = useMemo(() => {
-    return movements.filter((movement) => {
-      const matchesItem =
-        !itemId || movement.itemId === itemId;
+    return movements
+      .filter((movement) => {
+        const matchesItem =
+          !itemId || movement.itemId === itemId;
 
-      const matchesLocation =
-        !locationId ||
-        movement.sourceLocationId === locationId ||
-        movement.destinationLocationId === locationId;
+        const matchesLocation =
+          !locationId ||
+          movement.sourceLocationId === locationId ||
+          movement.destinationLocationId === locationId;
 
-      const matchesType =
-        !type || movement.type === type;
+        const matchesType =
+          !type || movement.type === type;
 
-      const matchesReason =
-        !reason ||
-        movement.reason
-          .toLowerCase()
-          .includes(reason.toLowerCase());
+        const matchesReason =
+          !reason ||
+          movement.reason
+            .toLowerCase()
+            .includes(reason.toLowerCase());
 
-      const matchesFromDate =
-        !fromDate || movement.date >= fromDate;
+        const matchesFromDate =
+          !fromDate || movement.date >= fromDate;
 
-      const matchesToDate =
-        !toDate || movement.date <= toDate;
+        const matchesToDate =
+          !toDate || movement.date <= toDate;
 
-      return (
-        matchesItem &&
-        matchesLocation &&
-        matchesType &&
-        matchesReason &&
-        matchesFromDate &&
-        matchesToDate
-      );
-    });
+        return (
+          matchesItem &&
+          matchesLocation &&
+          matchesType &&
+          matchesReason &&
+          matchesFromDate &&
+          matchesToDate
+        );
+      })
+      .sort((a, b) => b.date.localeCompare(a.date));
   }, [
     movements,
     itemId,
@@ -67,32 +71,21 @@ export default function MovementHistory() {
     toDate,
   ]);
 
-  function getPartName(id: string) {
-    return (
-      parts.find((part) => part.id === id)?.name ??
-      "Unknown item"
-    );
+  function getPart(id: string) {
+    return parts.find((part) => part.id === id);
   }
 
-  function getPartCode(id: string) {
-    return (
-      parts.find((part) => part.id === id)?.partCode ??
-      "—"
-    );
-  }
-
-  function getLocationName(id?: string) {
+  function getLocation(id?: string) {
     if (!id) {
-      return "—";
+      return undefined;
     }
 
-    return (
-      locations.find((location) => location.id === id)
-        ?.name ?? "Unknown location"
-    );
+    return locations.find((location) => location.id === id);
   }
 
-  function getMovementLabel(movementType: StockMovementType) {
+  function getMovementLabel(
+    movementType: StockMovementType,
+  ) {
     switch (movementType) {
       case "issue":
         return "Issue";
@@ -110,40 +103,45 @@ export default function MovementHistory() {
   ) {
     switch (movementType) {
       case "issue":
-        return "bg-red-50 text-red-700 border-red-200";
+        return "movement-history-type movement-history-type-issue";
+
       case "return":
-        return "bg-green-50 text-green-700 border-green-200";
+        return "movement-history-type movement-history-type-return";
+
       case "adjustment":
-        return "bg-amber-50 text-amber-700 border-amber-200";
+        return "movement-history-type movement-history-type-adjustment";
+
       default:
-        return "bg-gray-50 text-gray-700 border-gray-200";
+        return "movement-history-type movement-history-type-default";
     }
   }
 
   return (
-    <div className="space-y-6">
+    <div className="movement-history-page">
       <PageHeader
         eyebrow="Inventory"
         title="Movement History"
         description="Review the append-only history of stock issues, returns, and adjustments."
       />
 
-      <Panel
-        title="Filters"
-        description="Filter stock movements by item, location, type, reason, or date range."
-      >
-        <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-          <div>
-            <label className="mb-2 block text-sm font-medium text-[#162033]">
+      {/* Filters */}
+      <section className="movement-history-filters">
+        
+
+        <div className="movement-history-filter-grid">
+          {/* Spare Part */}
+          <div className="movement-history-field">
+            <label htmlFor="movement-item">
               Spare Part
             </label>
 
             <select
+              id="movement-item"
               value={itemId}
               onChange={(event) =>
                 setItemId(event.target.value)
               }
-              className="input w-full"
+              className="movement-history-control"
             >
               <option value="">All spare parts</option>
 
@@ -155,17 +153,19 @@ export default function MovementHistory() {
             </select>
           </div>
 
-          <div>
-            <label className="mb-2 block text-sm font-medium text-[#162033]">
+          {/* Location */}
+          <div className="movement-history-field">
+            <label htmlFor="movement-location">
               Location
             </label>
 
             <select
+              id="movement-location"
               value={locationId}
               onChange={(event) =>
                 setLocationId(event.target.value)
               }
-              className="input w-full"
+              className="movement-history-control"
             >
               <option value="">All locations</option>
 
@@ -180,12 +180,14 @@ export default function MovementHistory() {
             </select>
           </div>
 
-          <div>
-            <label className="mb-2 block text-sm font-medium text-[#162033]">
+          {/* Movement Type */}
+          <div className="movement-history-field">
+            <label htmlFor="movement-type">
               Movement Type
             </label>
 
             <select
+              id="movement-type"
               value={type}
               onChange={(event) =>
                 setType(
@@ -194,7 +196,7 @@ export default function MovementHistory() {
                     | "",
                 )
               }
-              className="input w-full"
+              className="movement-history-control"
             >
               <option value="">All types</option>
               <option value="issue">Issue</option>
@@ -205,252 +207,281 @@ export default function MovementHistory() {
             </select>
           </div>
 
-          <div>
-            <label className="mb-2 block text-sm font-medium text-[#162033]">
+          {/* Reason */}
+          <div className="movement-history-field">
+            <label htmlFor="movement-reason">
               Reason
             </label>
 
             <input
+              id="movement-reason"
+              type="search"
               value={reason}
               onChange={(event) =>
                 setReason(event.target.value)
               }
-              className="input w-full"
-              placeholder="Search reason"
+              className="movement-history-control"
+              placeholder="Search reason..."
             />
           </div>
 
-          <div>
-            <label className="mb-2 block text-sm font-medium text-[#162033]">
-              From Date
-            </label>
+          {/* Date Range */}
+          <div className="movement-history-date-range">
+            <div className="movement-history-date-field">
+              <label htmlFor="movement-from-date">
+                From Date
+              </label>
 
-            <input
-              type="date"
-              value={fromDate}
-              onChange={(event) =>
-                setFromDate(event.target.value)
-              }
-              className="input w-full"
-            />
-          </div>
+              <input
+                id="movement-from-date"
+                type="date"
+                value={fromDate}
+                onChange={(event) =>
+                  setFromDate(event.target.value)
+                }
+                className="movement-history-control"
+              />
+            </div>
 
-          <div>
-            <label className="mb-2 block text-sm font-medium text-[#162033]">
-              To Date
-            </label>
+            <div className="movement-history-date-field">
+              <label htmlFor="movement-to-date">
+                To Date
+              </label>
 
-            <input
-              type="date"
-              value={toDate}
-              onChange={(event) =>
-                setToDate(event.target.value)
-              }
-              className="input w-full"
-            />
+              <input
+                id="movement-to-date"
+                type="date"
+                value={toDate}
+                onChange={(event) =>
+                  setToDate(event.target.value)
+                }
+                className="movement-history-control"
+              />
+            </div>
           </div>
         </div>
-      </Panel>
+      </section>
 
-      <Panel
-        title="Stock Movements"
-        description={`${filteredMovements.length} movement${
-          filteredMovements.length === 1 ? "" : "s"
-        } found. Newest movements appear first.`}
-      >
+      {/* Stock Movements */}
+      <section className="movement-history-table-card">
+        <div className="movement-history-table-header">
+          <h3>Stock Movements</h3>
+
+          <span className="movement-history-counter">
+            {filteredMovements.length}{" "}
+            {filteredMovements.length === 1
+              ? "movement"
+              : "movements"}{" "}
+            found. Newest movements appear first.
+          </span>
+        </div>
+
         {filteredMovements.length === 0 ? (
-        <div className="rounded-md border border-[#dfe4ea] bg-white px-6 py-10 text-center">
-        <p className="text-sm font-medium text-[#162033]">
-          No movements found
-        </p>
-      
-        <p className="mt-1 text-sm text-[#647086]">
-          There are no stock movements matching the selected filters.
-        </p>
-      </div>
+          <div className="movement-history-empty">
+            <p className="movement-history-empty-title">
+              No movements found
+            </p>
+
+            <p className="movement-history-empty-description">
+              There are no stock movements matching the
+              selected filters.
+            </p>
+          </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[1100px] text-left">
+          <div className="movement-history-table-wrapper">
+            <table className="movement-history-table">
               <thead>
-                <tr className="border-b border-[#dfe4ea] text-sm text-[#647086]">
-                  <th className="px-4 py-3 font-medium">
-                    Date
-                  </th>
-
-                  <th className="px-4 py-3 font-medium">
-                    Type
-                  </th>
-
-                  <th className="px-4 py-3 font-medium">
-                    Item
-                  </th>
-
-                  <th className="px-4 py-3 font-medium">
-                    Source
-                  </th>
-
-                  <th className="px-4 py-3 font-medium">
-                    Destination
-                  </th>
-
-                  <th className="px-4 py-3 font-medium">
-                    Quantity
-                  </th>
-
-                  <th className="px-4 py-3 font-medium">
-                    Reason
-                  </th>
-
-                  <th className="px-4 py-3 font-medium">
-                    References
-                  </th>
+                <tr>
+                  <th>Date</th>
+                  <th>Type</th>
+                  <th>Item</th>
+                  <th>Route</th>
+                  <th>Qty</th>
+                  <th>Reason</th>
+                  <th>References</th>
                 </tr>
               </thead>
 
               <tbody>
-                {filteredMovements.map((movement) => (
-                  <tr
-                    key={movement.id}
-                    className="border-b border-[#eef1f4] last:border-b-0"
-                  >
-                    <td className="px-4 py-4 text-sm text-[#162033]">
-                      {movement.date}
-                    </td>
+                {filteredMovements.map((movement) => {
+                  const part = getPart(movement.itemId);
+                  const source = getLocation(
+                    movement.sourceLocationId,
+                  );
+                  const destination = getLocation(
+                    movement.destinationLocationId,
+                  );
 
-                    <td className="px-4 py-4">
-                      <span
-                        className={`inline-flex rounded-full border px-2.5 py-1 text-xs font-medium ${getMovementBadgeClass(
-                          movement.type,
-                        )}`}
-                      >
-                        {getMovementLabel(
-                          movement.type,
-                        )}
-                      </span>
-                    </td>
+                  return (
+                    <tr key={movement.id}>
+                      {/* Date */}
+                      <td className="movement-history-date">
+                        {movement.date}
+                      </td>
 
-                    <td className="px-4 py-4">
-  <Link
-    href={`/inventory/spare-parts/${movement.itemId}`}
-    className="text-sm font-medium text-[#0f766e] hover:underline"
-  >
-    {getPartName(movement.itemId)}
-  </Link>
-
-  <div className="text-xs text-[#647086]">
-    {getPartCode(movement.itemId)}
-  </div>
-</td>
-
-<td className="px-4 py-4 text-sm">
-  {movement.sourceLocationId ? (
-    <Link
-      href={`/inventory/stock-locations/${movement.sourceLocationId}`}
-      className="text-[#0f766e] hover:underline"
-    >
-      {getLocationName(movement.sourceLocationId)}
-    </Link>
-  ) : (
-    "—"
-  )}
-</td>
-<td className="px-4 py-4 text-sm">
-  {movement.destinationLocationId ? (
-    <Link
-      href={`/inventory/stock-locations/${movement.destinationLocationId}`}
-      className="text-[#0f766e] hover:underline"
-    >
-      {getLocationName(
-        movement.destinationLocationId,
-      )}
-    </Link>
-  ) : (
-    "—"
-  )}
-</td>
-
-                    <td className="px-4 py-4 text-sm font-medium text-[#162033]">
-                      {movement.quantity}
-                    </td>
-
-                    <td className="px-4 py-4">
-                      <div className="text-sm text-[#162033]">
-                        {movement.reason}
-                      </div>
-
-                      {movement.reasonCode && (
-                        <div className="text-xs text-[#647086]">
-                          {movement.reasonCode}
-                        </div>
-                      )}
-                    </td>
-
-                    <td className="px-4 py-4">
-                      <div className="space-y-1 text-xs text-[#647086]">
-                        {movement.workOrderReference && (
-                          <div>
-                            WO:{" "}
-                            {movement.workOrderReference}
-                          </div>
-                        )}
-
-{movement.assetId && (
-  <div>
-    Asset:{" "}
-    <Link
-      href={`/assets/${movement.assetId}`}
-      className="text-[#0f766e] hover:underline"
-    >
-      {movement.assetId}
-    </Link>
-  </div>
-)}
-
-                        {movement.technicianName && (
-                          <div>
-                            Technician:{" "}
-                            {movement.technicianName}
-                          </div>
-                        )}
-
-                        {movement.actorName && (
-                          <div>
-                            Actor:{" "}
-                            {movement.actorName}
-                          </div>
-                        )}
-
-                        {movement.condition && (
-                          <div>
-                            Condition:{" "}
-                            {movement.condition}
-                          </div>
-                        )}
-
-                        {movement.adjustmentDirection && (
-                          <div>
-                            Direction:{" "}
-                            {movement.adjustmentDirection}
-                          </div>
-                        )}
-
-                        {!movement.workOrderReference &&
-                          !movement.assetId &&
-                          !movement.technicianName &&
-                          !movement.actorName &&
-                          !movement.condition &&
-                          !movement.adjustmentDirection && (
-                            <span>—</span>
+                      {/* Type */}
+                      <td>
+                        <span
+                          className={getMovementBadgeClass(
+                            movement.type,
                           )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                        >
+                          {getMovementLabel(
+                            movement.type,
+                          )}
+                        </span>
+                      </td>
+
+                      {/* Item */}
+                      <td>
+                        <div className="movement-history-item">
+                          <Link
+                            href={`/inventory/spare-parts/${movement.itemId}`}
+                            className="movement-history-item-name"
+                          >
+                            {part?.name ?? "Unknown item"}
+                          </Link>
+
+                          <span className="movement-history-item-code">
+                            {part?.partCode ?? "—"}
+                          </span>
+                        </div>
+                      </td>
+
+                      {/* Route */}
+                      <td>
+                        <div className="movement-history-route">
+                          {source ? (
+                            <Link
+                              href={`/inventory/stock-locations/${source.id}`}
+                              className="movement-history-route-link"
+                            >
+                              {source.name}
+                            </Link>
+                          ) : (
+                            <span className="movement-history-route-empty">
+                              —
+                            </span>
+                          )}
+
+                          <span
+                            className="movement-history-route-arrow"
+                            aria-hidden="true"
+                          >
+                            →
+                          </span>
+
+                          {destination ? (
+                            <Link
+                              href={`/inventory/stock-locations/${destination.id}`}
+                              className="movement-history-route-link"
+                            >
+                              {destination.name}
+                            </Link>
+                          ) : (
+                            <span className="movement-history-route-empty">
+                              —
+                            </span>
+                          )}
+                        </div>
+                      </td>
+
+                      {/* Quantity */}
+                      <td>
+                        <span className="movement-history-quantity">
+                          {movement.quantity}
+                        </span>
+                      </td>
+
+                      {/* Reason */}
+                      <td>
+                        <div className="movement-history-reason">
+                          <span>
+                            {movement.reason}
+                          </span>
+
+                          {movement.reasonCode && (
+                            <span className="movement-history-reason-code">
+                              {movement.reasonCode}
+                            </span>
+                          )}
+                        </div>
+                      </td>
+
+                      {/* References */}
+                      <td>
+                        <div className="movement-history-references">
+                          {movement.workOrderReference && (
+                            <div>
+                              <span className="movement-history-reference-label">
+                                Work Order:
+                              </span>{" "}
+                              <span className="movement-history-reference-workorder">
+                                {movement.workOrderReference}
+                              </span>
+                            </div>
+                          )}
+
+                          {movement.assetId && (
+                            <div>
+                              <span className="movement-history-reference-label">
+                                Asset:
+                              </span>{" "}
+                              <Link
+                                href={`/assets/${movement.assetId}`}
+                                className="movement-history-reference-asset"
+                              >
+                                {movement.assetId}
+                              </Link>
+                            </div>
+                          )}
+
+                          {movement.technicianName && (
+                            <div className="movement-history-reference-muted">
+                              Tech: {movement.technicianName}
+                            </div>
+                          )}
+
+                          {movement.condition && (
+                            <div className="movement-history-reference-muted">
+                              Condition:{" "}
+                              {movement.condition}
+                            </div>
+                          )}
+
+                          {movement.actorName && (
+                            <div className="movement-history-reference-muted">
+                              Actor: {movement.actorName}
+                            </div>
+                          )}
+
+                          {movement.adjustmentDirection && (
+                            <div className="movement-history-reference-muted">
+                              Direction:{" "}
+                              {movement.adjustmentDirection}
+                            </div>
+                          )}
+
+                          {!movement.workOrderReference &&
+                            !movement.assetId &&
+                            !movement.technicianName &&
+                            !movement.condition &&
+                            !movement.actorName &&
+                            !movement.adjustmentDirection && (
+                              <span className="movement-history-reference-empty">
+                                —
+                              </span>
+                            )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
         )}
-      </Panel>
+      </section>
     </div>
   );
 }

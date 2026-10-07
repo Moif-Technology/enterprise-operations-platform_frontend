@@ -1,9 +1,15 @@
 import Link from "next/link";
 
 import PageHeader from "@/components/ui/PageHeader";
-import { Badge, Button, Panel } from "@/components/ui/design-system";
-import { getItemStockSummary, getMovements, getSparePartById, getStockBalances, getStockLocations } from "@/modules/inventory/service";
-import { getAssets } from "@/modules/assets/service";
+import { Badge, Button } from "@/components/ui/design-system";
+
+import {
+  getItemStockSummary,
+  getMovements,
+  getSparePartById,
+  getStockBalances,
+  getStockLocations,
+} from "@/modules/inventory/service";
 
 type SparePartDetailPageProps = {
   params: Promise<{
@@ -11,339 +17,328 @@ type SparePartDetailPageProps = {
   }>;
 };
 
+function formatMovementType(type: string) {
+  return type.charAt(0).toUpperCase() + type.slice(1);
+}
+
 export default async function SparePartDetailPage({
   params,
 }: SparePartDetailPageProps) {
   const { itemId } = await params;
-
   const item = getSparePartById(itemId);
 
   if (!item) {
     return (
-      <main className="w-full max-w-full">
-        <div className="w-full max-w-full">
-          <PageHeader
-            title="Spare part not found"
-            description="The requested spare part does not exist."
-            action={
-              <Link href="/inventory/spare-parts">
-                <Button variant="secondary">
-                  Back to Spare Parts
-                </Button>
-              </Link>
-            }
-          />
+      <main className="spare-part-detail-page">
+        <PageHeader
+          eyebrow="Inventory / Spare Parts"
+          title="Spare part not found"
+          description="The requested spare part does not exist."
+          action={
+            <Link href="/inventory/spare-parts">
+              <Button variant="secondary">Back to Spare Parts</Button>
+            </Link>
+          }
+        />
 
-          <Panel title="Unknown record">
-            <p className="text-sm text-[#647086]">
-              The spare part may have been removed or the link may be
-              invalid.
-            </p>
-          </Panel>
-        </div>
+        <section className="spare-part-detail-card">
+          <h3>Unknown record</h3>
+          <p>
+            The spare part may have been removed or the link may be invalid.
+          </p>
+        </section>
       </main>
     );
   }
 
   const stockSummary = getItemStockSummary(item.id);
+
   const balances = getStockBalances().filter(
     (balance) => balance.itemId === item.id,
   );
+
   const locations = getStockLocations();
-  const recentMovements = getMovements().filter(
-    (movement) => movement.itemId === item.id,
-  ).slice(0, 5);
-  const assets = getAssets().filter(
-    (asset) => asset.category === item.category,
+
+  const recentMovements = getMovements()
+    .filter((movement) => movement.itemId === item.id)
+    .slice(0, 5);
+
+  const preferredWarehouse = locations.find(
+    (location) => location.id === item.preferredWarehouseId,
   );
 
   return (
-    <main className="w-full max-w-full">
-      <div className="w-full max-w-full space-y-6">
-        <PageHeader
-          eyebrow="Inventory"
-          title={item.name}
-          description={`${item.partCode} · ${item.category}`}
-          action={
-            <div className="flex gap-3">
-              <Link href="/inventory/spare-parts">
-                <Button variant="secondary">
-                  Back
-                </Button>
-              </Link>
-
-              <Link
-                href={`/inventory/spare-parts/${item.id}/edit`}
+    <main className="spare-part-detail-page">
+      <PageHeader
+        eyebrow="Inventory / Spare Parts"
+        title={item.name}
+        description={`Category: ${item.category} | Preferred Warehouse: ${
+          preferredWarehouse?.name ?? "—"
+        }`}
+        action={
+          <Link href={`/inventory/spare-parts/${item.id}/edit`}>
+            <Button>
+              <svg
+                aria-hidden="true"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
               >
-                <Button>Edit Spare Part</Button>
-              </Link>
-            </div>
-          }
-        />
+              
+                <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z" />
+              </svg>
+              Edit Spare Part
+            </Button>
+          </Link>
+        }
+      />
 
-        <Panel title="Item information">
-          <div className="grid gap-5 md:grid-cols-2">
-            <div>
-              <p className="text-xs font-medium uppercase tracking-wide text-[#647086]">
-                Part code
-              </p>
-              <p className="mt-1 text-sm text-[#162033]">
-                {item.partCode}
-              </p>
-            </div>
+      <div className="spare-part-detail-title-meta">
+        <Badge tone={item.status === "active" ? "success" : "neutral"}>
+          {item.status === "active" ? "Active" : "Inactive"}
+        </Badge>
 
-            <div>
-              <p className="text-xs font-medium uppercase tracking-wide text-[#647086]">
-                Status
-              </p>
-              <div className="mt-1">
-                <Badge
-                  tone={
-                    item.status === "active"
-                      ? "success"
-                      : "neutral"
-                  }
-                >
-                  {item.status === "active"
-                    ? "Active"
-                    : "Inactive"}
-                </Badge>
-              </div>
+        <span className="spare-part-detail-code">
+          {item.partCode}
+        </span>
+      </div>
+
+      <div className="spare-part-detail-dashboard">
+        <div className="spare-part-detail-main">
+          <section className="spare-part-stock-stats">
+            <div className="spare-part-stat-card">
+              <p>Total On Hand</p>
+              <strong>
+                {stockSummary?.totalQuantity ?? 0} {item.unitOfMeasure}
+              </strong>
             </div>
 
-            <div>
-              <p className="text-xs font-medium uppercase tracking-wide text-[#647086]">
-                Category
-              </p>
-              <p className="mt-1 text-sm text-[#162033]">
-                {item.category}
-              </p>
+            <div className="spare-part-stat-card">
+              <p>Usable Stock</p>
+              <strong className="spare-part-stat-usable">
+                {stockSummary?.usableQuantity ?? 0} {item.unitOfMeasure}
+              </strong>
             </div>
 
-            <div>
-              <p className="text-xs font-medium uppercase tracking-wide text-[#647086]">
-                Unit of measure
-              </p>
-              <p className="mt-1 text-sm text-[#162033]">
-                {item.unitOfMeasure}
-              </p>
+            <div className="spare-part-stat-card">
+              <p>Damaged Stock</p>
+              <strong className="spare-part-stat-damaged">
+                {stockSummary?.damagedQuantity ?? 0} {item.unitOfMeasure}
+              </strong>
             </div>
+          </section>
 
-            <div>
-              <p className="text-xs font-medium uppercase tracking-wide text-[#647086]">
-                Manufacturer
+          <section className="spare-part-detail-card">
+            <div className="spare-part-detail-card-header">
+              <h3>Stock Locations Breakdown</h3>
+              <p>
+                Stock quantities across warehouses and technician stock.
               </p>
-              <p className="mt-1 text-sm text-[#162033]">
-                {item.manufacturer || "—"}
-              </p>
-            </div>
-
-            <div>
-              <p className="text-xs font-medium uppercase tracking-wide text-[#647086]">
-                Manufacturer part number
-              </p>
-              <p className="mt-1 text-sm text-[#162033]">
-                {item.manufacturerPartNumber || "—"}
-              </p>
-            </div>
-
-            <div>
-              <p className="text-xs font-medium uppercase tracking-wide text-[#647086]">
-                Reorder level
-              </p>
-              <p className="mt-1 text-sm text-[#162033]">
-                {item.reorderLevel}
-              </p>
-            </div>
-
-            <div>
-              <p className="text-xs font-medium uppercase tracking-wide text-[#647086]">
-                Preferred warehouse
-              </p>
-              <p className="mt-1 text-sm text-[#162033]">
-                {locations.find(
-                  (location) =>
-                    location.id === item.preferredWarehouseId,
-                )?.name ?? "—"}
-              </p>
-            </div>
-          </div>
-
-          {(item.description || item.notes) && (
-            <div className="mt-6 grid gap-5 md:grid-cols-2">
-              {item.description && (
-                <div>
-                  <p className="text-xs font-medium uppercase tracking-wide text-[#647086]">
-                    Description
-                  </p>
-                  <p className="mt-1 text-sm text-[#162033]">
-                    {item.description}
-                  </p>
-                </div>
-              )}
-
-              {item.notes && (
-                <div>
-                  <p className="text-xs font-medium uppercase tracking-wide text-[#647086]">
-                    Notes
-                  </p>
-                  <p className="mt-1 text-sm text-[#162033]">
-                    {item.notes}
-                  </p>
-                </div>
-              )}
-            </div>
-          )}
-        </Panel>
-
-        <Panel
-          title="Current stock"
-          description="Stock quantities are derived from opening balances and recorded movements."
-        >
-          <div className="mb-5 grid gap-4 sm:grid-cols-3">
-            <div className="rounded-lg border border-[#dfe4ea] bg-white p-4">
-              <p className="text-xs font-medium uppercase tracking-wide text-[#647086]">
-                Total on hand
-              </p>
-              <p className="mt-1 text-xl font-semibold text-[#162033]">
-                {stockSummary?.totalQuantity ?? 0}
-              </p>
-            </div>
-
-            <div className="rounded-lg border border-[#dfe4ea] bg-white p-4">
-              <p className="text-xs font-medium uppercase tracking-wide text-[#647086]">
-                Usable
-              </p>
-              <p className="mt-1 text-xl font-semibold text-[#162033]">
-                {stockSummary?.usableQuantity ?? 0}
-              </p>
-            </div>
-
-            <div className="rounded-lg border border-[#dfe4ea] bg-white p-4">
-              <p className="text-xs font-medium uppercase tracking-wide text-[#647086]">
-                Damaged
-              </p>
-              <p className="mt-1 text-xl font-semibold text-[#b91c1c]">
-                {stockSummary?.damagedQuantity ?? 0}
-              </p>
-            </div>
-          </div>
-
-          <div className="table-shell overflow-x-auto">
-            <div
-              className="table-head"
-              style={{
-                gridTemplateColumns: "1.2fr 1fr 0.8fr 0.8fr",
-                minWidth: 700,
-              }}
-            >
-              <span>Location</span>
-              <span>Type</span>
-              <span>On hand</span>
-              <span>Damaged</span>
             </div>
 
             {balances.length === 0 ? (
-              <div className="p-5 text-sm text-[#647086]">
+              <div className="spare-part-detail-empty">
                 No stock has been recorded for this item.
               </div>
             ) : (
-              balances.map((balance) => {
-                const location = locations.find(
-                  (entry) => entry.id === balance.locationId,
-                );
+              <div className="spare-part-detail-table-wrapper">
+                <table className="spare-part-detail-table">
+                  <thead>
+                    <tr>
+                      <th>Location</th>
+                      <th>Type</th>
+                      <th>On Hand</th>
+                      <th>Damaged</th>
+                    </tr>
+                  </thead>
 
-                return (
-                  <div
-                    key={`${balance.itemId}-${balance.locationId}`}
-                    className="table-row"
-                    style={{
-                      gridTemplateColumns:
-                        "1.2fr 1fr 0.8fr 0.8fr",
-                      minWidth: 700,
-                    }}
-                  >
-                    <span>
-                      {location?.name ?? "Unknown location"}
-                    </span>
-                    <span>
-                      {location?.type === "technician"
-                        ? "Technician"
-                        : "Warehouse"}
-                    </span>
-                    <span>{balance.quantity}</span>
-                    <span>{balance.damagedQuantity}</span>
-                  </div>
-                );
-              })
-            )}
-          </div>
-        </Panel>
+                  <tbody>
+                    {balances.map((balance) => {
+                      const location = locations.find(
+                        (entry) => entry.id === balance.locationId,
+                      );
 
-        <Panel
-          title="Recent movements"
-          description="The five most recent stock movements for this spare part."
-        >
-          {recentMovements.length === 0 ? (
-            <p className="text-sm text-[#647086]">
-              No movements have been recorded for this item.
-            </p>
-          ) : (
-            <div className="table-shell overflow-x-auto">
-              <div
-                className="table-head"
-                style={{
-                  gridTemplateColumns: "0.9fr 0.9fr 1.3fr 1fr 1.2fr",
-                  minWidth: 850,
-                }}
-              >
-                <span>Date</span>
-                <span>Type</span>
-                <span>Source / destination</span>
-                <span>Quantity</span>
-                <span>Reason</span>
+                      return (
+                        <tr
+                          key={`${balance.itemId}-${balance.locationId}`}
+                        >
+                          <td className="spare-part-detail-location">
+                            {location?.name ?? "Unknown location"}
+                          </td>
+
+                          <td className="spare-part-detail-type">
+                            {location?.type === "technician"
+                              ? "Technician"
+                              : "Warehouse"}
+                          </td>
+
+                          <td className="spare-part-detail-on-hand">
+                            {balance.quantity}
+                          </td>
+
+                          <td className="spare-part-detail-damaged">
+                            {balance.damagedQuantity}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
               </div>
+            )}
+          </section>
 
-              {recentMovements.map((movement) => {
-                const source = movement.sourceLocationId
-                  ? locations.find(
-                      (location) => location.id === movement.sourceLocationId,
-                    )?.name
-                  : undefined;
-
-                const destination = movement.destinationLocationId
-                  ? locations.find(
-                      (location) =>
-                        location.id === movement.destinationLocationId,
-                    )?.name
-                  : undefined;
-
-                return (
-                  <div
-                    key={movement.id}
-                    className="table-row"
-                    style={{
-                      gridTemplateColumns:
-                        "0.9fr 0.9fr 1.3fr 1fr 1.2fr",
-                      minWidth: 850,
-                    }}
-                  >
-                    <span>{movement.date}</span>
-                    <span className="capitalize">{movement.type}</span>
-                    <span>
-                      {source ?? "—"} → {destination ?? "—"}
-                    </span>
-                    <span>{movement.quantity}</span>
-                    <span>{movement.reason}</span>
-                  </div>
-                );
-              })}
+          <section className="spare-part-detail-card">
+            <div className="spare-part-detail-card-header">
+              <h3>Recent Movements</h3>
+              <p>
+                Audit trail of recent stock entries, transfers, and issues.
+              </p>
             </div>
-          )}
-        </Panel>
 
+            {recentMovements.length === 0 ? (
+              <div className="spare-part-detail-empty">
+                No movements have been recorded for this item.
+              </div>
+            ) : (
+              <div className="spare-part-detail-table-wrapper">
+                <table className="spare-part-detail-table spare-part-movements-table">
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Type</th>
+                      <th>Source / Destination</th>
+                      <th>Quantity</th>
+                      <th>Reason</th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    {recentMovements.map((movement) => {
+                      const source = movement.sourceLocationId
+                        ? locations.find(
+                            (location) =>
+                              location.id === movement.sourceLocationId,
+                          )?.name
+                        : undefined;
+
+                      const destination = movement.destinationLocationId
+                        ? locations.find(
+                            (location) =>
+                              location.id === movement.destinationLocationId,
+                          )?.name
+                        : undefined;
+
+                      return (
+                        <tr key={movement.id}>
+                          <td>{movement.date}</td>
+
+                          <td>
+                            {formatMovementType(movement.type)}
+                          </td>
+
+                          <td>
+                            {source ?? "—"} → {destination ?? "—"}
+                          </td>
+
+                          <td className="spare-part-detail-on-hand">
+                            {movement.quantity}
+                          </td>
+
+                          <td>{movement.reason}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </section>
+        </div>
+
+        <aside className="spare-part-detail-sidebar">
+          <section className="spare-part-detail-card">
+            <div className="spare-part-detail-card-header">
+              <h3>Part Overview</h3>
+            </div>
+
+            <div className="spare-part-detail-key-values">
+              <DetailField
+                label="Part Code"
+                value={item.partCode}
+              />
+
+              <DetailField
+                label="Category"
+                value={item.category}
+              />
+
+              <DetailField
+                label="Unit of Measure"
+                value={item.unitOfMeasure}
+              />
+
+              <DetailField
+                label="Manufacturer"
+                value={item.manufacturer || "—"}
+              />
+
+              <DetailField
+                label="MPN"
+                value={item.manufacturerPartNumber || "—"}
+              />
+
+              <DetailField
+                label="Reorder Level"
+                value={String(item.reorderLevel)}
+              />
+
+              <DetailField
+                label="Preferred Warehouse"
+                value={preferredWarehouse?.name ?? "—"}
+              />
+            </div>
+          </section>
+
+          <section className="spare-part-detail-card">
+            <div className="spare-part-detail-card-header">
+              <h3>Description & Notes</h3>
+            </div>
+
+            <div className="spare-part-detail-key-values">
+              <DetailField
+                label="Description"
+                value={item.description || "—"}
+              />
+
+              <DetailField
+                label="Notes"
+                value={item.notes || "—"}
+              />
+            </div>
+          </section>
+        </aside>
       </div>
     </main>
   );
 }
 
+function DetailField({
+  label,
+  value,
+}: {
+  label: string;
+  value: string;
+}) {
+  return (
+    <div className="spare-part-detail-field">
+      <p className="spare-part-detail-label">{label}</p>
+      <p className="spare-part-detail-value">{value}</p>
+    </div>
+  );
+}
