@@ -65,15 +65,13 @@ export default async function AssetDetailPage({
 
   return (
     <main className="w-full">
-      <div className="w-full space-y-6 p-6">
+      <div className="w-full p-6">
         {/* Header */}
         <div className="asset-detail-header">
           <div className="asset-detail-header-main">
-      
-
             <div className="asset-detail-title-row">
               <h1>{asset.name}</h1>
-
+  
               <Badge
                 tone={
                   asset.status === "active"
@@ -87,41 +85,51 @@ export default async function AssetDetailPage({
               >
                 {asset.status}
               </Badge>
-
-              <span className="asset-detail-code">
-                {asset.assetCode}
-              </span>
+  
+              <span className="asset-detail-code">{asset.assetCode}</span>
             </div>
-
+  
             <div className="asset-detail-meta">
               <span>
                 Customer: {customer?.name ?? "Unknown customer"}
               </span>
-              <span>|</span>
+              <span aria-hidden="true">•</span>
               <span>
                 Site: {site?.name ?? "Unknown site"}
               </span>
-              <span>|</span>
+              <span aria-hidden="true">•</span>
               <span>Category: {asset.category}</span>
             </div>
           </div>
-
+  
           <div className="asset-detail-header-actions">
-  <Link href="/assets">
-    <Button variant="secondary" type="button">
-      Cancel
-    </Button>
-  </Link>
-
-  <Link href={`/assets/${asset.id}/edit`}>
-    <Button>
-      <span aria-hidden="true">✎</span>
-      Edit Asset
-    </Button>
-  </Link>
-</div>
+            <Link href="/assets">
+              <Button variant="secondary" type="button">
+                Cancel
+              </Button>
+            </Link>
+  
+            <Link href={`/assets/${asset.id}/edit`}>
+              <Button type="button">
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z" />
+                </svg>
+                Edit Asset
+              </Button>
+            </Link>
+          </div>
         </div>
-
+  
         {/* Dashboard */}
         <div className="asset-detail-dashboard">
           {/* Main column */}

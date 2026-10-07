@@ -61,21 +61,32 @@ export default function MaintenancePlanList() {
 
   return (
     <div className="maintenance-plans-page">
-      <PageHeader
-        title="Maintenance Plans"
-        description="Manage preventive maintenance schedules for registered assets."
-        action={
-          <Link
-            href="/maintenance-plans/new"
-            className="maintenance-plans-create-link"
-          >
-            <Button size="sm">
-              <span aria-hidden="true"></span>
-              Create Plan
-            </Button>
-          </Link>
-        }
-      />
+  <PageHeader
+  title="Maintenance Plans"
+  description="Manage preventive maintenance schedules for registered assets."
+  action={
+    <Link
+      href="/maintenance-plans/new"
+      className="maintenance-plans-create-link"
+    >
+      <Button size="sm">
+        <span aria-hidden="true"></span>
+        Create Plan
+      </Button>
+    </Link>
+  }
+  secondaryAction={
+    <button
+      type="button"
+      className="asset-refresh-button"
+      onClick={() => window.location.reload()}
+      aria-label="Refresh maintenance plans"
+      title="Refresh maintenance plans"
+    >
+      ↻
+    </button>
+  }
+/>
 
       <section className="maintenance-plans-filter-card">
        

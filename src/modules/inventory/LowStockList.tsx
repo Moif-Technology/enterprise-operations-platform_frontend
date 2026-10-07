@@ -69,11 +69,22 @@ export default function LowStockList() {
 
   return (
     <div className="low-stock-page">
-      <PageHeader
-        eyebrow="Inventory"
-        title="Low Stock & Reorder"
-        description="Review spare parts at or below their reorder level and see the quantity needed to reach that level."
-      />
+    <PageHeader
+  eyebrow="Inventory"
+  title="Low Stock & Reorder"
+  description="Review spare parts at or below their reorder level and see the quantity needed to reach that level."
+  secondaryAction={
+    <button
+      type="button"
+      className="asset-refresh-button"
+      onClick={() => window.location.reload()}
+      aria-label="Refresh low stock list"
+      title="Refresh low stock list"
+    >
+      ↻
+    </button>
+  }
+/>
 
       {/* KPI Summary */}
       <div className="low-stock-kpi-grid">
@@ -144,13 +155,7 @@ export default function LowStockList() {
 
       {/* Filters */}
       <section className="low-stock-filter-card">
-        <div className="low-stock-filter-header">
-          <h3>Filters</h3>
-
-          <p>
-            Filter low-stock items by part or category.
-          </p>
-        </div>
+       
 
         <div className="low-stock-filter-controls">
           <div className="low-stock-search">

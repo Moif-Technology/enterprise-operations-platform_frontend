@@ -38,17 +38,24 @@ export default function CustomerList() {
 
   return (
     <div className="space-y-6">
-   <PageHeader
-  title="Customers"
-  description="Manage customers and their service relationships."
+ <PageHeader
+  title="Sites"
+  description="Manage customer sites and locations."
   action={
-    <Button
-    size="sm"
-    onClick={() => router.push("/customers/new")}
-  >
-    <span aria-hidden="true"></span>
-    Create Customer
-  </Button>
+    <Link href="/sites/new">
+      <Button size="sm">Create Site</Button>
+    </Link>
+  }
+  secondaryAction={
+    <button
+      type="button"
+      className="asset-refresh-button"
+      onClick={() => window.location.reload()}
+      aria-label="Refresh sites"
+      title="Refresh sites"
+    >
+      ↻
+    </button>
   }
 />
 

@@ -60,6 +60,17 @@ export default function StockLocationList() {
             </Button>
           </Link>
         }
+        secondaryAction={
+          <button
+            type="button"
+            className="asset-refresh-button"
+            onClick={() => window.location.reload()}
+            aria-label="Refresh stock locations"
+            title="Refresh stock locations"
+          >
+            ↻
+          </button>
+        }
       />
 
       <section className="stock-locations-filters">

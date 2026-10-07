@@ -141,10 +141,21 @@ export default function UpcomingMaintenance() {
 
   return (
     <main className="upcoming-maintenance-page">
-      <PageHeader
-        title="Upcoming Maintenance"
-        description="Track upcoming, due, and overdue preventive maintenance schedules."
-      />
+    <PageHeader
+  title="Upcoming Maintenance"
+  description="Track upcoming, due, and overdue preventive maintenance schedules."
+  secondaryAction={
+    <button
+      type="button"
+      className="asset-refresh-button"
+      onClick={() => window.location.reload()}
+      aria-label="Refresh upcoming maintenance"
+      title="Refresh upcoming maintenance"
+    >
+      ↻
+    </button>
+  }
+/>
 
       <section className="upcoming-maintenance-stats">
         <div className="upcoming-maintenance-stat-card">

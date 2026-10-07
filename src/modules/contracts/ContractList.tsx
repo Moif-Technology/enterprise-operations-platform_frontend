@@ -170,17 +170,28 @@ export function ContractList() {
 
   return (
     <main className="contracts-page">
-      <PageHeader
-        title="Contracts & AMC"
-        description="Manage customer contracts, AMC coverage, terms, and lifecycle records."
-        action={
-          <Button
-            onClick={() => router.push("/contracts/new")}
-          >
-            Create Contract
-          </Button>
-        }
-      />
+   <PageHeader
+  title="Contracts & AMC"
+  description="Manage customer contracts, AMC coverage, terms, and lifecycle records."
+  action={
+    <Button
+      onClick={() => router.push("/contracts/new")}
+    >
+      Create Contract
+    </Button>
+  }
+  secondaryAction={
+    <button
+      type="button"
+      className="asset-refresh-button"
+      onClick={() => window.location.reload()}
+      aria-label="Refresh contracts"
+      title="Refresh contracts"
+    >
+      ↻
+    </button>
+  }
+/>
 
       <section className="contracts-filter-card">
        

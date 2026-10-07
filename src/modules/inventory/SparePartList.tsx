@@ -134,107 +134,119 @@ export default function SparePartList() {
   return (
     <section className="spare-parts-page">
       <PageHeader
-        eyebrow="Inventory"
-        title="Spare Parts"
-        description="Manage the spare part item master and monitor current stock levels."
-        action={
-          <Button
-            onClick={() => router.push("/inventory/spare-parts/new")}
-          >
-            <span aria-hidden="true">+</span>
-            Add Spare Part
-          </Button>
-        }
-      />
+  eyebrow="Inventory"
+  title="Spare Parts"
+  description="Manage the spare part item master and monitor current stock levels."
+  action={
+    <Button
+      onClick={() => router.push("/inventory/spare-parts/new")}
+    >
+      <span aria-hidden="true">+</span>
+      Add Spare Part
+    </Button>
+  }
+  secondaryAction={
+    <button
+      type="button"
+      className="asset-refresh-button"
+      onClick={() => window.location.reload()}
+      aria-label="Refresh spare parts"
+      title="Refresh spare parts"
+    >
+      ↻
+    </button>
+  }
+/>
 
-      <section className="spare-parts-filters">
-        <div className="spare-parts-filter-grid">
-          <div className="spare-parts-search">
-            <label htmlFor="spare-part-search">Search</label>
+<section className="spare-parts-filters">
+  <div className="spare-parts-filter-grid">
+    {/* Search */}
+    <div className="spare-parts-search">
+      <div className="spare-parts-search-wrapper">
+        <svg
+          aria-hidden="true"
+          className="spare-parts-search-icon"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+        >
+          <circle cx="11" cy="11" r="7" />
+          <path d="m20 20-3.5-3.5" />
+        </svg>
 
-            <div className="spare-parts-search-wrapper">
-              <svg
-                aria-hidden="true"
-                className="spare-parts-search-icon"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <circle cx="11" cy="11" r="7" />
-                <path d="m20 20-3.5-3.5" />
-              </svg>
+        <input
+          id="spare-part-search"
+          type="search"
+          placeholder="Search name, code, category..."
+          value={search}
+          onChange={(event) => setSearch(event.target.value)}
+          aria-label="Search spare parts"
+        />
+      </div>
+    </div>
 
-              <input
-                id="spare-part-search"
-                type="search"
-                placeholder="Search name, code, category..."
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
-                aria-label="Search spare parts"
-              />
-            </div>
-          </div>
+    {/* Category */}
+    <FormField
+      label=""
+      name="spare-part-filter-category"
+      type="select"
+      selectProps={{
+        value: category,
+        onChange: (event) => setCategory(event.target.value),
+      }}
+    >
+      <option value="all">All Categories</option>
+      {categories.map((item) => (
+        <option key={item} value={item}>
+          {item}
+        </option>
+      ))}
+    </FormField>
 
-          <FormField
-            label="Category"
-            name="spare-part-filter-category"
-            type="select"
-            selectProps={{
-              value: category,
-              onChange: (event) => setCategory(event.target.value),
-            }}
-          >
-            <option value="all">All categories</option>
+    {/* Status */}
+    <FormField
+      label=""
+      name="spare-part-filter-status"
+      type="select"
+      selectProps={{
+        value: status,
+        onChange: (event) => setStatus(event.target.value),
+      }}
+    >
+      <option value="all">All Statuses</option>
+      {ITEM_STATUSES.map((item) => (
+        <option key={item} value={item}>
+          {formatStatusLabel(item)}
+        </option>
+      ))}
+    </FormField>
 
-            {categories.map((item) => (
-              <option key={item} value={item}>
-                {item}
-              </option>
-            ))}
-          </FormField>
+    {/* Stock Level */}
+    <FormField
+      label=""
+      name="spare-part-filter-stock"
+      type="select"
+      selectProps={{
+        value: stockLevel,
+        onChange: (event) => setStockLevel(event.target.value),
+      }}
+    >
+      <option value="all">All Stock Levels</option>
+      <option value="low">Low Stock</option>
+      <option value="out">Out of Stock</option>
+    </FormField>
 
-          <FormField
-            label="Status"
-            name="spare-part-filter-status"
-            type="select"
-            selectProps={{
-              value: status,
-              onChange: (event) => setStatus(event.target.value),
-            }}
-          >
-            <option value="all">All statuses</option>
-
-            {ITEM_STATUSES.map((item) => (
-              <option key={item} value={item}>
-                {formatStatusLabel(item)}
-              </option>
-            ))}
-          </FormField>
-
-          <FormField
-            label="Stock Level"
-            name="spare-part-filter-stock"
-            type="select"
-            selectProps={{
-              value: stockLevel,
-              onChange: (event) => setStockLevel(event.target.value),
-            }}
-          >
-            <option value="all">All stock levels</option>
-            <option value="low">Low stock</option>
-            <option value="out">Out of stock</option>
-          </FormField>
-
-          <button
-            type="button"
-            className="spare-parts-clear-button"
-            onClick={clearFilters}
-          >
-            Clear Filters
-          </button>
-        </div>
-      </section>
+    {/* Clear Filters */}
+    <button
+      type="button"
+      className="spare-parts-clear-button"
+      onClick={clearFilters}
+    >
+      Clear Filters
+    </button>
+  </div>
+</section>
 
       {listStatus === "loading" && (
         <LoadingState message="Loading spare parts..." />

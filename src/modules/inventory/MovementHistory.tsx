@@ -118,11 +118,22 @@ export default function MovementHistory() {
 
   return (
     <div className="movement-history-page">
-      <PageHeader
-        eyebrow="Inventory"
-        title="Movement History"
-        description="Review the append-only history of stock issues, returns, and adjustments."
-      />
+    <PageHeader
+  eyebrow="Inventory"
+  title="Movement History"
+  description="Review the append-only history of stock issues, returns, and adjustments."
+  secondaryAction={
+    <button
+      type="button"
+      className="asset-refresh-button"
+      onClick={() => window.location.reload()}
+      aria-label="Refresh movement history"
+      title="Refresh movement history"
+    >
+      ↻
+    </button>
+  }
+/>
 
       {/* Filters */}
       <section className="movement-history-filters">

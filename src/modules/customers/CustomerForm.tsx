@@ -159,6 +159,7 @@ return (
       id="customer-form"
       onSubmit={handleSubmit}
       className="customer-form"
+      noValidate
     >
 
 

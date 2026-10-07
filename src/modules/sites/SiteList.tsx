@@ -53,15 +53,26 @@ export default function SiteList() {
 
   return (
     <div className="sites-page">
-      <PageHeader
-        title="Sites"
-        description="Manage customer sites and locations."
-        action={
-          <Link href="/sites/new">
-            <Button size="sm">Create Site</Button>
-          </Link>
-        }
-      />
+    <PageHeader
+  title="Sites"
+  description="Manage customer sites and locations."
+  action={
+    <Link href="/sites/new">
+      <Button size="sm">Create Site</Button>
+    </Link>
+  }
+  secondaryAction={
+    <button
+      type="button"
+      className="asset-refresh-button"
+      onClick={() => window.location.reload()}
+      aria-label="Refresh sites"
+      title="Refresh sites"
+    >
+      ↻
+    </button>
+  }
+/>
 
       <section className="sites-filter-card">
         
