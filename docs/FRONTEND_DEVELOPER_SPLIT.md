@@ -2,6 +2,8 @@
 
 ## Current assignment update
 
+Current as of 2026-10-09: Arshidha's active assignment is [Module 05 - Procurement and Receiving](assignments/ARSHIDHA_MODULE_05.md), following Module 04 Inventory and Spare Parts. Source and PR target are `sabeeh`; implementation branch is `feature/arshidha-module-05-procurement-receiving`. This personal Module 05 maps to roadmap Module 08 Procurement. Earlier assignment notes below are historical; Swetha retains Operations, Work Orders and Dispatch.
+
 Current as of 2026-09-28: Arshidha's next assignment is [Module 04 - Inventory and Spare Parts](assignments/ARSHIDHA_MODULE_04.md) on `sabeeh`. Module 03 was her previous assignment; its submitted implementation on `feature/arshidha-module-03-customers-contracts` is the baseline. Her Module 04 numbering is personal: this scope maps to roadmap Module 07, not the roadmap's Scheduling and Dispatch module. The [Module 03 assignment](assignments/ARSHIDHA_MODULE_03.md) and the earlier assignment notes below are historical.
 
 Arshidha's Module 01 is complete per the project owner. Her active second assignment is [ARSHIDHA_MODULE_02.md](assignments/ARSHIDHA_MODULE_02.md) on branch `sabeeh`: Assets and Basic Preventive Maintenance. Follow that file for her current scope; the Module-01-only directions below describe the earlier foundation stage. Operations Core ownership remains with Swetha.

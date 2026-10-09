@@ -4,6 +4,8 @@ Frontend starter for the Enterprise Operations Platform.
 
 ## First Priority
 
+Current as of 2026-10-09: Arshidha's active assignment is [Module 05 - Procurement and Receiving](docs/assignments/ARSHIDHA_MODULE_05.md) on `sabeeh`, following Module 04 Inventory and Spare Parts. Use this specification and its [task-app agent prompt](docs/assignments/ARSHIDHA_MODULE_05_TASK_ISSUE.md). Earlier assignment notes below are historical.
+
 Arshidha's current assignment is [Module 03 - Customers, Sites, Contracts and AMC](docs/assignments/ARSHIDHA_MODULE_03.md) on `sabeeh`, following her submitted Module 02 implementation. Use Module 03 for the next task; the Module 02 instructions below are historical.
 
 Arshidha's active next task is [Module 02 - Assets and Basic Preventive Maintenance](docs/assignments/ARSHIDHA_MODULE_02.md), available on branch `sabeeh`. Module 01 is complete per the project owner. The assignment includes setup commands, full scope, acceptance criteria and a copy-paste prompt for Claude/Codex. Historical Module 01 restrictions below apply to the foundation assignment, not her newly assigned scope.
